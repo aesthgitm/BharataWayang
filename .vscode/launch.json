@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "BharataWayang (Pixel 4)",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "BharataWayang (Release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
