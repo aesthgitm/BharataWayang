@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      // Assuming authProvider uses username/email
+      // Login menggunakan email
       final success = await authProvider.login(
         _emailController.text.trim(),
         _passwordController.text,

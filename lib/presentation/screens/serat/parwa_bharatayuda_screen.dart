@@ -36,6 +36,7 @@ class _ParwaBharatayudaScreenState extends State<ParwaBharatayudaScreen> {
       final userId = authProvider.currentUser?.id;
       if (userId != null) {
         narasiProvider.loadProgres(userId);
+        narasiProvider.loadParwa('Bharatayuda');
         if (koleksiProvider.semuaKartu.isEmpty) {
           koleksiProvider.loadData(userId);
         }
@@ -223,6 +224,10 @@ class _ParwaBharatayudaScreenState extends State<ParwaBharatayudaScreen> {
     final sudahSelesai =
         _sudahSelesai || narasiProvider.isBabakSelesai(_parwaId);
 
+    final hasData = narasiProvider.parwaAktif.isNotEmpty &&
+        narasiProvider.parwaAktif.first.namaParwa == 'Bharatayuda';
+    final paragraphs = hasData ? narasiProvider.parwaAktif.first.isiNarasi.split('\n\n') : <String>[];
+
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: AppBar(
@@ -256,32 +261,6 @@ class _ParwaBharatayudaScreenState extends State<ParwaBharatayudaScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // White Box with Gunungan Image (Placeholder)
-              Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Image.asset(
-                  'assets/images/ui/digital_gunungan_nobg.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(height: 24),
               Text(
                 'PARWA V',
                 style: AppTypography.labelText.copyWith(
@@ -323,42 +302,38 @@ class _ParwaBharatayudaScreenState extends State<ParwaBharatayudaScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Content Paragraphs
-              _buildStoryParagraph(
-                'Pandawa berusaha mencari sekutu dan ia mendapat bantuan pasukan dari Kerajaan Kerajaan Kekaya, Kerajaan Matsya, Kerajaan Pandya, Kerajaan Chola, Kerajaan Kerala, Kerajaan Magadha, Wangsa Yadawa, Kerajaan Dwaraka, dan masih banyak lagi. Selain itu para ksatria besar di Bharatawarsha seperti misalnya Drupada, Setyaki, Drestadjumna, Srikandi, dan lain-lain ikut memihak Pandawa.  Sementara itu Duryudana meminta Bisma untuk memimpin pasukan Kurawa sekaligus mengangkatnya sebagai panglima tertinggi pasukan Kurawa. Kurawa dibantu oleh Resi Dorna dan putranya Aswatama, kakak ipar para Kurawa yaitu Jayadrata, serta guru Krepa, Kertawarma, Salya, Sudaksina, Burisrawa, Bahlika, Sengkuni, Karna, dan masih banyak lagi.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Pertempuran berlangsung selama 18 hari penuh. Dalam pertempuran itu, banyak ksatria yang gugur, seperti misalnya Abimanyu, Durna, Karna, Bisma, Gatotkaca, Irawan, Prabu Matswapati dan puteranya  (Raden Seta, Raden Utara, Raden Wratsangka),  Bhogadatta, Sengkuni,  dan masih banyak lagi.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Hari 1–10: Kepemimpinan Bisma Perang dimulai di medan Kurukshetra dengan Bisma sebagai panglima Kurawa. Ia sangat kuat dan hampir tak terkalahkan karena tidak ingin membunuh Pandawa sepenuh hati. Banyak pasukan Pandawa gugur di fase ini. Akhirnya, atas saran Kresna, Arjuna menggunakan Srikandi (reinkarnasi Amba yang dibenci Bisma) sebagai tameng. Bisma tidak mau melawan Srikandi, sehingga Arjuna berhasil menjatuhkannya dengan banyak panah hingga ia roboh di atas “ranjang panah”.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Hari 11–15: Kepemimpinan Drona Setelah Bisma jatuh, Drona menjadi panglima. Ia menggunakan strategi licik seperti formasi Cakravyuha. Dalam formasi ini, Abimanyu (putra Arjuna) masuk dan bertarung dengan gagah berani, tetapi akhirnya gugur karena dikeroyok secara tidak adil. Kematian Abimanyu membuat Pandawa sangat marah. Untuk mengalahkan Drona, digunakan tipu muslihat: dikabarkan bahwa Aswatama (anak Drona) telah mati. Mendengar itu, Drona kehilangan semangat dan akhirnya terbunuh.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Hari 16–17: Kepemimpinan Karna Karna kemudian menjadi panglima. Ia adalah petarung hebat dan rival utama Arjuna. Pertempuran antara Karna dan Arjuna menjadi salah satu momen paling penting. Saat bertarung, roda kereta Karna terjebak di tanah, dan ia tidak bisa melawan dengan maksimal. Dalam kondisi itu, Arjuna atas perintah Kresna tetap menyerang, dan akhirnya Karna gugur.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Hari 18: Akhir Perang dan Jatuhnya Kurawa. Hari terakhir menjadi penentu. Hampir seluruh pasukan Kurawa telah hancur. Pertempuran terakhir terjadi antara Bima dan Duryudana. Bima melanggar aturan dengan memukul paha Duryudana (bagian yang seharusnya tidak boleh diserang), hingga Duryudana kalah dan sekarat. Dengan jatuhnya Duryudana, perang pun berakhir dan kemenangan berada di pihak Pandawa.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Dampak Setelah Bharatayuda  Perang ini menewaskan hampir seluruh ksatria besar dari kedua pihak, menyisakan hanya sedikit yang hidup. Kemenangan Pandawa dibayar dengan kehilangan besar, termasuk keluarga dan sekutu mereka. Setelah itu, Yudistira menjadi raja, namun hidupnya dipenuhi rasa sedih dan penyesalan. Bharatayuda menunjukkan bahwa meskipun menang, perang tetap membawa kehancuran dan penderitaan bagi semua pihak.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Setelah perang berakhir, Yudistira dinobatkan sebagai Raja Hastinapura bergelar Prabu Kalimataya Setelah memerintah selama beberapa lama, ia menyerahkan tahta kepada cucu Arjuna, yaitu Parikesit. Kemudian, Yudistira bersama Pandawa dan Drupadi  mendaki gunung Himalaya sebagai tujuan akhir perjalanan mereka. Di sana mereka meninggal dan mencapai surga. (Diceritakan dalam kisah Pandawa Seda).',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Parikesit memerintah Kerajaan Kuru dengan adil dan bijaksana. Ia menikahi Madrawati dan memiliki putera bernama Janamejaya. Janamejaya menikahi Wapushtama (Bhamustiman) dan memiliki putera  bernama Satanika. Satanika berputera Aswamedhadatta. Aswamedhadatta dan  keturunannya kemudian memimpin Kerajaan Wangsa Kuru di Hastinapura.',
-              ),
+              // Content Paragraphs - Loaded Dynamically
+              if (narasiProvider.isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: CircularProgressIndicator(color: AppColors.accent),
+                  ),
+                )
+              else if (paragraphs.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: Text(
+                      'Memuat cerita...',
+                      style: TextStyle(color: AppColors.textDark),
+                    ),
+                  ),
+                )
+              else
+                ...List.generate(paragraphs.length, (index) {
+                  final paragraph = paragraphs[index];
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: _buildDroppedCapParagraph(paragraph),
+                    );
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: _buildStoryParagraph(paragraph),
+                  );
+                }),
 
               const SizedBox(height: 40),
               SvgPicture.asset(
@@ -406,6 +381,46 @@ class _ParwaBharatayudaScreenState extends State<ParwaBharatayudaScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDroppedCapParagraph(String text) {
+    if (text.isEmpty) return const SizedBox.shrink();
+    final String firstLetter = text.substring(0, 1);
+    final String remainingText = text.substring(1);
+
+    return RichText(
+      textAlign: TextAlign.justify,
+      text: TextSpan(
+        style: AppTypography.bodyLarge.copyWith(
+          color: AppColors.textDark.withValues(alpha: 0.8),
+          height: 1.6,
+        ),
+        children: [
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: Container(
+              margin: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withValues(alpha: 0.1),
+                border: Border.all(color: AppColors.accent, width: 1.5),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                firstLetter,
+                style: GoogleFonts.cinzel(
+                  color: AppColors.accent,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          TextSpan(text: remainingText),
+        ],
       ),
     );
   }

@@ -36,6 +36,7 @@ class _ParwaAdiScreenState extends State<ParwaAdiScreen> {
       final userId = authProvider.currentUser?.id;
       if (userId != null) {
         narasiProvider.loadProgres(userId);
+        narasiProvider.loadParwa('Adiparwa');
         if (koleksiProvider.semuaKartu.isEmpty) {
           koleksiProvider.loadData(userId);
         }
@@ -223,6 +224,10 @@ class _ParwaAdiScreenState extends State<ParwaAdiScreen> {
     final sudahSelesai =
         _sudahSelesai || narasiProvider.isBabakSelesai(_parwaId);
 
+    final hasData = narasiProvider.parwaAktif.isNotEmpty &&
+        narasiProvider.parwaAktif.first.namaParwa == 'Adiparwa';
+    final paragraphs = hasData ? narasiProvider.parwaAktif.first.isiNarasi.split('\n\n') : <String>[];
+
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: AppBar(
@@ -256,32 +261,6 @@ class _ParwaAdiScreenState extends State<ParwaAdiScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // White Box with Gunungan Image (Placeholder)
-              Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Image.asset(
-                  'assets/images/ui/digital_gunungan_nobg.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(height: 24),
               Text(
                 'PARWA I',
                 style: AppTypography.labelText.copyWith(
@@ -323,22 +302,38 @@ class _ParwaAdiScreenState extends State<ParwaAdiScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Content Paragraphs
-              _buildStoryParagraph(
-                'Dikisahkan pada zaman dahulu kala, dunia masih diselimuti misteri dan keheningan. Kisah Mahabharata diawali dengan  pertemuan Raja Duswanta dengan Sakuntala. Raja Duswanta adalah seorang  raja besar dari Chandrawangsa keturunan Yayati, menikahi Sakuntala dari  pertapaan Bagawan Kanwa, kemudian menurunkan Sang Bharata. Sang Bharata menurunkan Sang Hasti, yang kemudian mendirikan sebuah  pusat pemerintahan bernama Hastinapura. Sang Hasti menurunkan Para Raja  Hastinapura. Dari keluarga tersebut, lahirlah Sang Kuru, yang menguasai  dan menyucikan sebuah daerah luas yang disebut Kurukshetra. Sang Kuru menurunkan Dinasti Kuru  atau Wangsa Kaurawa. Dalam Dinasti tersebut, lahirlah Pratipa, yang  menjadi ayah Prabu Santanu, leluhur Pandawa dan Kurawa.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Prabu Santanu seorang raja mahsyur dari garis keturunan Sang  Kuru, berasal dari Hastinapura. Ia menikah dengan Dewi Gangga yang  dikutuk agar turun ke dunia, namun Dewi Gangga meninggalkannya karena  Sang Prabu melanggar janji pernikahan. Hubungan Sang Prabu dengan Dewi  Gangga sempat membuahkan 7 anak, akan tetapi semua ditenggelamkan ke laut Gangga oleh Dewi Gangga dengan alasan semua sudah terkena kutukan. Akan tetapi kemudian anak ke 8 bisa diselamatkan oleh Prabu Santanu yang diberi nama Dewabrata. Kemudian Dewi Ganggapun pergi meninggalkan Prabu Santanu. Nama Dewabrata diganti menjadi Bisma karena ia melakukan bhishan pratigya yaitu sumpah untuk membujang selamanya dan tidak akan mewarisi tahta  ayahnya. Hal itu dikarenakan Bisma tidak ingin dia dan keturunannya  berselisih dengan keturunan Satyawati, ibu tirinya.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Setelah ditinggal Dewi Gangga, akhirnya Prabu Santanu menjadi duda.  Beberapa tahun kemudian, Prabu Santanu melanjutkan kehidupan berumah  tangga dengan menikahi Dewi Satyawati, puteri nelayan. Dari hubungannya,  Sang Prabu berputera Sang Citranggada dan Wicitrawirya.  Demi kebahagiaan adik-adiknya, Bisma pergi ke Kerajaan Kasi dan memenangkan sayembara sehingga berhasil membawa pulang tiga orang puteri bernama Amba, Ambika, dan Ambalika, untuk dinikahkan kepada adik-adiknya. Karena Citranggada wafat, maka Ambika dan Ambalika menikah dengan Wicitrawirya, sedangkan Amba mencintai Bisma namun Bisma menolak cintanya karena  terikat oleh sumpah bahwa ia tidak akan kawin seumur hidup. Demi usaha  untuk menjauhkan Amba dari dirinya, tanpa sengaja ia menembakkan panah  menembus dada Amba. Atas kematian itu, Bisma diberitahu bahwa kelak Amba  bereinkarnasi menjadi seorang pangeran yang memiliki sifat kewanitaan, yaitu putera Raja Drupada yang bernama Srikandi. (Kalau versi Jawa, Srikandi adalah seorang wanita sejati) Kelak kematiannya juga berada di tangan Srikandi yang membantu Arjuna dalam pertempuran akbar di Kurukshetra.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Citranggada  wafat di usia muda dalam suatu pertempuran, kemudian ia digantikan oleh  adiknya yaitu Wicitrawirya. Wicitrawirya juga wafat di usia muda dan  belum sempat memiliki keturunan.',
-              ),
+              // Content Paragraphs - Loaded Dynamically
+              if (narasiProvider.isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: CircularProgressIndicator(color: AppColors.accent),
+                  ),
+                )
+              else if (paragraphs.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: Text(
+                      'Memuat cerita...',
+                      style: TextStyle(color: AppColors.textDark),
+                    ),
+                  ),
+                )
+              else
+                ...List.generate(paragraphs.length, (index) {
+                  final paragraph = paragraphs[index];
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: _buildDroppedCapParagraph(paragraph),
+                    );
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: _buildStoryParagraph(paragraph),
+                  );
+                }),
 
               const SizedBox(height: 40),
               SvgPicture.asset(
@@ -388,6 +383,46 @@ class _ParwaAdiScreenState extends State<ParwaAdiScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDroppedCapParagraph(String text) {
+    if (text.isEmpty) return const SizedBox.shrink();
+    final String firstLetter = text.substring(0, 1);
+    final String remainingText = text.substring(1);
+
+    return RichText(
+      textAlign: TextAlign.justify,
+      text: TextSpan(
+        style: AppTypography.bodyLarge.copyWith(
+          color: AppColors.textDark.withValues(alpha: 0.8),
+          height: 1.6,
+        ),
+        children: [
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: Container(
+              margin: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withValues(alpha: 0.1),
+                border: Border.all(color: AppColors.accent, width: 1.5),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                firstLetter,
+                style: GoogleFonts.cinzel(
+                  color: AppColors.accent,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          TextSpan(text: remainingText),
+        ],
       ),
     );
   }

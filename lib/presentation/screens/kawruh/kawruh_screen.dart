@@ -10,6 +10,7 @@ import '../../../providers/auth_provider.dart';
 import '../../../data/repositories/wayang_repository.dart';
 import '../pengaturan/pengaturan_screen.dart';
 import '../../widgets/main_shell.dart';
+import '../../widgets/profile_image.dart';
 import 'pengertian_wayang_screen.dart';
 import 'sejarah_wayang_screen.dart';
 import 'jenis_wayang_screen.dart';
@@ -118,6 +119,7 @@ class _KawruhScreenState extends State<KawruhScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().currentUser;
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: AppBar(
@@ -139,15 +141,24 @@ class _KawruhScreenState extends State<KawruhScreen> {
                 }
               },
               child: Container(
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.textDark, width: 1.5),
+                  color: Colors.white,
                 ),
-                padding: const EdgeInsets.all(4),
-                child: const Icon(
-                  Icons.person_outline,
-                  color: AppColors.textDark,
-                  size: 20,
+                child: ClipOval(
+                  child: ProfileImage(
+                    fotoProfil: user?.fotoProfil,
+                    size: 32,
+                    fit: BoxFit.cover,
+                    placeholder: const Icon(
+                      Icons.person_outline,
+                      color: AppColors.textDark,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -360,91 +371,60 @@ class _KawruhScreenState extends State<KawruhScreen> {
         height: 120,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: AppColors.primary,
+          gradient: const LinearGradient(
+            colors: [AppColors.primary, AppColors.dark],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.2),
+              color: AppColors.dark.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Stack(
-          children: [
-            // Background Image Overlay
-            Positioned.fill(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Opacity(
-                  opacity: 0.3,
-                  child: Image.asset(
-                    'assets/images/ui/digital_gunungan_nobg.png', // Fallback
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                  ),
-                ),
-              ),
-            ),
-            // Gradient Overlay for readability
-            Positioned.fill(
-              child: Container(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.accent, width: 1),
                   borderRadius: BorderRadius.circular(12),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      AppColors.primary.withValues(alpha: 0.8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'ENSIKLOPEDIA',
+                      style: AppTypography.labelText.copyWith(
+                        color: AppColors.accent,
+                        fontSize: 8,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    if (isRead) ...[
+                      const SizedBox(width: 8),
+                      const Icon(Icons.check_circle, color: AppColors.accent, size: 12),
                     ],
-                  ),
+                  ],
                 ),
               ),
-            ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.accent, width: 1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'ENSIKLOPEDIA',
-                          style: AppTypography.labelText.copyWith(
-                            color: AppColors.accent,
-                            fontSize: 8,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                        if (isRead) ...[
-                          const SizedBox(width: 8),
-                          const Icon(Icons.check_circle, color: AppColors.accent, size: 12),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    title,
-                    style: AppTypography.headingMedium.copyWith(
-                      color: AppColors.secondary,
-                      fontSize: 18,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: AppTypography.headingMedium.copyWith(
+                  color: AppColors.secondary,
+                  fontSize: 18,
+                  letterSpacing: 1.5,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

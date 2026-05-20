@@ -43,29 +43,36 @@ class ProfilKsatriaScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Avatar Section
+              // Wayang Card (Replicated from Mustika Screen)
               Container(
-                width: 140,
-                height: 140,
+                width: 180,
+                height: 257, // matches 0.7 aspect ratio (180 / 0.7 = 257)
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.accent, width: 4),
+                  color: AppColors.dark,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.accent,
+                    width: 2,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
+                      color: AppColors.accent.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-                child: ClipOval(
-                  child: Image.asset(
-                    kartu.imageAsset ?? 'assets/images/ui/digital_gunungan_nobg.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      'assets/images/ui/digital_gunungan_nobg.png',
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Opacity(
+                    opacity: 0.9,
+                    child: Image.asset(
+                      kartu.imageAsset ?? 'assets/images/ui/digital_gunungan_nobg.png',
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Image.asset(
+                        'assets/images/ui/digital_gunungan_nobg.png',
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),

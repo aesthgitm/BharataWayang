@@ -7,6 +7,7 @@ import '../../../providers/koleksi_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../data/models/kartu_wayang_model.dart';
 import '../../widgets/main_shell.dart';
+import '../../widgets/profile_image.dart';
 import 'profil_ksatria_screen.dart';
 
 class MustikaScreen extends StatefulWidget {
@@ -53,15 +54,24 @@ class _MustikaScreenState extends State<MustikaScreen> {
                     }
                   },
                   child: Container(
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: AppColors.textDark, width: 1.5),
+                      color: Colors.white,
                     ),
-                    padding: const EdgeInsets.all(4),
-                    child: const Icon(
-                      Icons.person_outline,
-                      color: AppColors.textDark,
-                      size: 20,
+                    child: ClipOval(
+                      child: ProfileImage(
+                        fotoProfil: authProvider.currentUser?.fotoProfil,
+                        size: 32,
+                        fit: BoxFit.cover,
+                        placeholder: const Icon(
+                          Icons.person_outline,
+                          color: AppColors.textDark,
+                          size: 20,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -196,7 +206,7 @@ class _MustikaScreenState extends State<MustikaScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.primary,
+          color: AppColors.dark,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isUnlocked ? AppColors.accent : AppColors.primary.withValues(alpha: 0.5),
@@ -222,7 +232,7 @@ class _MustikaScreenState extends State<MustikaScreen> {
                         0,      0,      0,      1, 0,
                       ]),
                 child: Opacity(
-                  opacity: isUnlocked ? 0.3 : 0.1,
+                  opacity: isUnlocked ? 0.9 : 0.05,
                   child: Image.asset(
                     kartu.imageAsset ?? 'assets/images/ui/digital_gunungan_nobg.png',
                     fit: BoxFit.cover,
@@ -251,15 +261,9 @@ class _MustikaScreenState extends State<MustikaScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        AppColors.primary.withValues(alpha: 0.8),
-                        AppColors.primary,
-                      ],
-                    ),
+                    color: isUnlocked
+                        ? AppColors.dark.withValues(alpha: 0.9)
+                        : AppColors.primary.withValues(alpha: 0.9),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

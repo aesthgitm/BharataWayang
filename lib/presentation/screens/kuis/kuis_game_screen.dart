@@ -248,25 +248,7 @@ class _KuisGameScreenState extends State<KuisGameScreen> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Gambar Gunungan
-                        Container(
-                          height: 140,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: AppColors.secondary.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.accent.withValues(alpha: 0.2)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Image.asset(
-                              'assets/images/ui/digital_gunungan_nobg.png',
-                              fit: BoxFit.contain,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
+
 
                         // Teks soal
                         Text(

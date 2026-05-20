@@ -1,6 +1,5 @@
 import '../models/serat_model.dart';
 import '../models/progres_narasi_model.dart';
-import '../models/faq_model.dart';
 import '../database/database_helper.dart';
 
 class SeratRepository {
@@ -53,18 +52,5 @@ class SeratRepository {
         'sudah_dibaca': 1,
       });
     }
-  }
-
-  /// Ambil list FAQ Mahabharata
-  Future<List<FaqMahabharata>> getAllFAQ() async {
-    final db = await _dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'faq_mahabharata',
-      orderBy: 'urutan ASC',
-    );
-
-    return List.generate(maps.length, (i) {
-      return FaqMahabharata.fromMap(maps[i]);
-    });
   }
 }

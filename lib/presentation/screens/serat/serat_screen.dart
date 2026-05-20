@@ -6,6 +6,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/narasi_provider.dart';
 import '../../widgets/main_shell.dart';
+import '../../widgets/profile_image.dart';
 import 'parwa_adi_screen.dart';
 import 'parwa_sabha_screen.dart';
 import 'parwa_wana_screen.dart';
@@ -35,6 +36,7 @@ class _SeratScreenState extends State<SeratScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().currentUser;
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: AppBar(
@@ -53,15 +55,24 @@ class _SeratScreenState extends State<SeratScreen> {
                 }
               },
               child: Container(
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.textDark, width: 1.5),
+                  color: Colors.white,
                 ),
-                padding: const EdgeInsets.all(4),
-                child: const Icon(
-                  Icons.person_outline,
-                  color: AppColors.textDark,
-                  size: 20,
+                child: ClipOval(
+                  child: ProfileImage(
+                    fotoProfil: user?.fotoProfil,
+                    size: 32,
+                    fit: BoxFit.cover,
+                    placeholder: const Icon(
+                      Icons.person_outline,
+                      color: AppColors.textDark,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ),
             ),

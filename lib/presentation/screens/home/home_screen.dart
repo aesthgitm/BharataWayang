@@ -11,6 +11,7 @@ import '../kuis/kuis_home_screen.dart';
 import '../mustika/profil_ksatria_screen.dart';
 import '../pengaturan/pengaturan_screen.dart';
 import '../../widgets/main_shell.dart';
+import '../../widgets/profile_image.dart';
 import 'feedback_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -100,18 +101,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     },
                     child: Container(
+                      width: 32,
+                      height: 32,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: AppColors.textDark,
                           width: 1.5,
                         ),
+                        color: Colors.white,
                       ),
-                      padding: const EdgeInsets.all(4),
-                      child: const Icon(
-                        Icons.person_outline,
-                        color: AppColors.textDark,
-                        size: 24,
+                      child: ClipOval(
+                        child: ProfileImage(
+                          fotoProfil: user?.fotoProfil,
+                          size: 32,
+                          fit: BoxFit.cover,
+                          placeholder: const Icon(
+                            Icons.person_outline,
+                            color: AppColors.textDark,
+                            size: 20,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -168,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(16),
                   image: const DecorationImage(
                     image: AssetImage(
-                      'assets/images/backgrounds/bg_simulasidalang.png',
+                      'assets/images/ui/wayang_simulasi.jpg',
                     ),
                     fit: BoxFit.cover,
                     opacity: 0.4,
@@ -598,12 +608,22 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               flex: 5,
               child: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(15),
                     topRight: Radius.circular(15),
                   ),
+                  image: kartu.imageAsset != null
+                      ? DecorationImage(
+                          image: AssetImage(kartu.imageAsset!),
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withValues(alpha: 0.4),
+                            BlendMode.darken,
+                          ),
+                        )
+                      : null,
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,

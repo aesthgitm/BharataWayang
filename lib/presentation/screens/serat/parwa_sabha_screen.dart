@@ -36,6 +36,7 @@ class _ParwaSabhaScreenState extends State<ParwaSabhaScreen> {
       final userId = authProvider.currentUser?.id;
       if (userId != null) {
         narasiProvider.loadProgres(userId);
+        narasiProvider.loadParwa('Sabhaparwa');
         if (koleksiProvider.semuaKartu.isEmpty) {
           koleksiProvider.loadData(userId);
         }
@@ -223,6 +224,10 @@ class _ParwaSabhaScreenState extends State<ParwaSabhaScreen> {
     final sudahSelesai =
         _sudahSelesai || narasiProvider.isBabakSelesai(_parwaId);
 
+    final hasData = narasiProvider.parwaAktif.isNotEmpty &&
+        narasiProvider.parwaAktif.first.namaParwa == 'Sabhaparwa';
+    final paragraphs = hasData ? narasiProvider.parwaAktif.first.isiNarasi.split('\n\n') : <String>[];
+
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: AppBar(
@@ -256,32 +261,6 @@ class _ParwaSabhaScreenState extends State<ParwaSabhaScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // White Box with Gunungan Image (Placeholder)
-              Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Image.asset(
-                  'assets/images/ui/digital_gunungan_nobg.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(height: 24),
               Text(
                 'PARWA II',
                 style: AppTypography.labelText.copyWith(
@@ -323,30 +302,38 @@ class _ParwaSabhaScreenState extends State<ParwaSabhaScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Content Paragraphs
-              _buildStoryParagraph(
-                'Satyawati mengirim kedua istri Wicitrawirya, yaitu Ambika dan Ambalika untuk menemui Resi Byasa, sebab Sang Resi dipanggil untuk mengadakan suatu upacara bagi mereka agar memperoleh keturunan.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Satyawati menyuruh Ambika agar menemui Resi Byasa di ruang upacara. Setelah Ambika memasuki ruangan upacara, ia melihat  wajah Sang Resi sangat dahsyat dengan mata yang menyala-nyala. Hal itu  membuatnya menutup mata. Karena Ambika menutup mata selama upacara  berlangsung, maka anaknya terlahir buta. Anak tersebut adalah  Drestarastra. Kemudian Ambalika disuruh oleh Satyawati untuk mengunjungi Byasa ke dalam sebuah kamar sendirian, dan di sana ia  akan diberi anugerah. Ia juga disuruh agar terus membuka matanya supaya  jangan melahirkan putra yang buta Drestarastra seperti yang telah dilakukan Ambika Maka dari itu, Ambalika terus membuka matanya namun ia menjadi pucat setelah melihat rupa Sang Bagawan Byasa yang luar biasa. Maka dari itu, Pandu (putranya), ayah para Pandawa, terlahir pucat. Drestarastra dan Pandu mempunyai saudara tiri yang bernama Widura. Widura merupakan anak dari Resi Byasa dengan seorang dayang Satyawati yang bernama Datri. Pada saat upacara dilangsungkan dia lari keluar kamar dan akhirnya terjatuh sehingga Widura pun lahir dengan kondisi pincang kakinya.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Dikarenakan Drestarastra terlahir buta mata maka tahta Hastinapura diberikan kepada Pandu. Pandu menikahi Dewi Kunti,kemudian Pandu menikah untuk yang kedua kalinya dengan Dewi Madrim,  namun akibat kesalahan Pandu pada saat memanah seekor kijang yang  sedang kasmaran, maka kijang tersebut mengeluarkan kutukan  bahwa Pandu tidak akan merasakan lagi hubungan suami istri, dan bila  dilakukannya, maka Pandu akan mengalami ajal. Kijang tersebut kemudian  mati dengan berubah menjadi wujud aslinya yaitu seorang pendeta. Kemudian karena mengalami kejadian buruk seperti itu, Pandu lalu  mengajak kedua istrinya untuk bermohon kepada Hyang Maha Kuasa agar  dapat diberikan anak.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Atas bantuan mantra yang pernah diberikan oleh Resi Druwasa maka Dewi Kunti bisa memanggil para dewa untuk kemudian mendapatkan putra. Pertama kali mencoba mantra tersebut datanglah Batara Surya, tak lama kemudian Kunti mengandung dan melahirkan seorang anak yang kemudian diberi nama Karna. Tetapi Karna kemudian dilarung kelaut dan dirawat oleh Kurawa, sehingga nanti pada saat perang Bharatayudha, Karna memihak kepada Kurawa.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Kemudian atas permintaan Pandu, Kunti mencoba mantra itu lagi, Batara Guru mengirimkan Batara Dharma untuk  membuahi Dewi Kunti sehingga lahir anak yang pertama yaitu Yudistira, setahun kemudian Batara Bayu dikirim juga untuk membuahi  Dewi Kunti sehingga lahirlah Bima, Batara Guru juga mengutus Batara Indra untuk membuahi Dewi Kunti  sehingga lahirlah Arjuna dan yang terakhir Batara Aswan dan Aswin  dikirimkan untuk membuahi Dewi Madrim, dan lahirlah Nakula dan Sadewa. Kelima putera Pandu tersebut dikenal sebagai Pandawa. Dretarastra yang buta menikahi Dewi Gendari, dan memiliki sembilan puluh sembilan orang putera dan seorang puteri yang dikenal dengan istilah Kurawa.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Pandawa dan Kurawa merupakan dua kelompok dengan sifat yang berbeda namun berasal dari leluhur yang sama, yakni Kuru dan Bharata. Kurawa (khususnya Duryudana)  bersifat licik dan selalu iri hati dengan kelebihan Pandawa, sedangkan  Pandawa bersifat tenang dan selalu bersabar ketika ditindas oleh sepupu  mereka. Ayah para Kurawa, yaitu Drestarastra, sangat menyayangi putera-puteranya. Hal itu membuat ia sering dihasut oleh iparnya yaitu Sengkuni, beserta putera kesayangannya yaitu Duryudana, agar mau mengizinkannya melakukan rencana jahat menyingkirkan para Pandawa.',
-              ),
+              // Content Paragraphs - Loaded Dynamically
+              if (narasiProvider.isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: CircularProgressIndicator(color: AppColors.accent),
+                  ),
+                )
+              else if (paragraphs.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: Text(
+                      'Memuat cerita...',
+                      style: TextStyle(color: AppColors.textDark),
+                    ),
+                  ),
+                )
+              else
+                ...List.generate(paragraphs.length, (index) {
+                  final paragraph = paragraphs[index];
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: _buildDroppedCapParagraph(paragraph),
+                    );
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: _buildStoryParagraph(paragraph),
+                  );
+                }),
 
               const SizedBox(height: 40),
               SvgPicture.asset(
@@ -394,6 +381,46 @@ class _ParwaSabhaScreenState extends State<ParwaSabhaScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDroppedCapParagraph(String text) {
+    if (text.isEmpty) return const SizedBox.shrink();
+    final String firstLetter = text.substring(0, 1);
+    final String remainingText = text.substring(1);
+
+    return RichText(
+      textAlign: TextAlign.justify,
+      text: TextSpan(
+        style: AppTypography.bodyLarge.copyWith(
+          color: AppColors.textDark.withValues(alpha: 0.8),
+          height: 1.6,
+        ),
+        children: [
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: Container(
+              margin: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withValues(alpha: 0.1),
+                border: Border.all(color: AppColors.accent, width: 1.5),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                firstLetter,
+                style: GoogleFonts.cinzel(
+                  color: AppColors.accent,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          TextSpan(text: remainingText),
+        ],
       ),
     );
   }

@@ -1,19 +1,16 @@
 import 'package:flutter/foundation.dart';
 import '../data/models/serat_model.dart';
 import '../data/models/progres_narasi_model.dart';
-import '../data/models/faq_model.dart';
 import '../data/repositories/serat_repository.dart';
 
 class NarasiProvider with ChangeNotifier {
   final SeratRepository _repository = SeratRepository();
 
   List<ProgresNarasi> _progresUser = [];
-  List<FaqMahabharata> _listFaq = [];
   List<SeratMahabharata> _parwaAktif = [];
   bool _isLoading = false;
 
   List<ProgresNarasi> get progresUser => _progresUser;
-  List<FaqMahabharata> get listFaq => _listFaq;
   List<SeratMahabharata> get parwaAktif => _parwaAktif;
   bool get isLoading => _isLoading;
 
@@ -28,15 +25,6 @@ class NarasiProvider with ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
-    }
-  }
-
-  Future<void> loadFAQ() async {
-    try {
-      _listFaq = await _repository.getAllFAQ();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("Error loading FAQ: $e");
     }
   }
   

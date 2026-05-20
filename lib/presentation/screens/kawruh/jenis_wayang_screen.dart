@@ -18,51 +18,61 @@ class _JenisWayangScreenState extends State<JenisWayangScreen> {
       'title': 'WAYANG KULIT PURWA',
       'description': 'Wayang kulit adalah jenis wayang paling terkenal di Indonesia yang terbuat dari kulit sapi atau kerbau. Dimainkan dengan teknik bayangan (menggunakan kelir dan blencong), mengangkat kisah epik Mahabharata dan Ramayana.',
       'tag': 'KULIT (LEATHER)',
+      'image': 'assets/images/ui/jenis_wayang/wayang_kulit.webp',
     },
     {
       'title': 'WAYANG GOLEK',
       'description': 'Boneka kayu tiga dimensi yang populer di tanah Sunda (Jawa Barat). Dipertontonkan tanpa layar bayangan, menggunakan bahasa Sunda, dan sering menyisipkan kisah bernuansa jenaka (Cepot) maupun epik lokal.',
       'tag': 'KAYU (WOODEN)',
+      'image': 'assets/images/ui/jenis_wayang/wayang_golek.webp',
     },
     {
       'title': 'WAYANG ORANG (WONG)',
       'description': 'Seni pertunjukan di mana tokoh wayang diperankan langsung oleh manusia dengan kostum, tata rias, dan tarian. Menggabungkan seni drama, tari, dan iringan gamelan khas keraton Jawa.',
       'tag': 'MANUSIA (HUMAN)',
+      'image': 'assets/images/ui/jenis_wayang/wayang_orang.webp',
     },
     {
       'title': 'WAYANG BEBER',
       'description': 'Salah satu bentuk wayang tertua di Indonesia. Ceritanya dilukis pada gulungan kain atau kertas (dibeber/dibentangkan). Dalang menceritakan kisah sambil menunjuk gambar pada gulungan tersebut.',
       'tag': 'GULUNGAN (SCROLL)',
+      'image': 'assets/images/ui/jenis_wayang/wayang_beber.webp',
     },
     {
       'title': 'WAYANG KLITIK (KRUCIL)',
       'description': 'Wayang pipih yang terbuat dari kayu jati. Berbeda dengan wayang golek yang 3D, wayang klitik berbentuk 2D. Dinamakan klitik karena suara kayu yang berbenturan saat wayang digerakkan berbunyi "klitik-klitik".',
       'tag': 'KAYU PIPIH (FLAT WOOD)',
+      'image': 'assets/images/ui/jenis_wayang/wayang_klitik.webp',
     },
     {
       'title': 'WAYANG GEDOG',
       'description': 'Mirip dengan wayang kulit purwa, namun khusus mengangkat cerita-cerita Panji (kisah romansa Raden Panji Asmarabangun dan Dewi Sekartaji) dari zaman Kerajaan Kediri dan Jenggala.',
       'tag': 'CERITA PANJI',
+      'image': 'assets/images/ui/jenis_wayang/wayang_gedog.webp',
     },
     {
       'title': 'WAYANG SULUH',
-      'description': 'Wayang modern yang muncul pada masa perjuangan kemerdekaan Indonesia. Digunakan sebagai alat penerangan (penyuluhan) dan propaganda. Tokoh-tokohnya digambarkan seperti manusia modern.',
+      'description': 'Wayang modern yang muncul pada masa perjuangan kemendeerkaan Indonesia. Digunakan sebagai alat penerangan (penyuluhan) dan propaganda. Tokoh-tokohnya digambarkan seperti manusia modern.',
       'tag': 'PENYULUHAN (MODERN)',
+      'image': 'assets/images/ui/jenis_wayang/wayang_suluh.webp',
     },
     {
       'title': 'WAYANG WAHYU',
       'description': 'Wayang kulit yang diciptakan untuk menyebarkan ajaran agama Katolik. Kisah yang diangkat diambil dari Alkitab, diciptakan oleh Bruder Timotheus L. Wignyosubroto pada tahun 1960-an.',
       'tag': 'KULIT (ALKITAB)',
+      'image': 'assets/images/ui/jenis_wayang/wayang_wahyu.webp',
     },
     {
       'title': 'WAYANG POTEHI',
       'description': 'Wayang boneka kain hasil asimilasi budaya Tionghoa dan Indonesia. Dimainkan dengan memasukkan tangan dalang ke dalam kantong boneka, biasanya membawakan kisah klasik Tiongkok kuno.',
       'tag': 'BONEKA KAIN (CLOTH)',
+      'image': 'assets/images/ui/jenis_wayang/wayang_potehi.webp',
     },
     {
       'title': 'WAYANG SASAK',
       'description': 'Wayang kulit khas dari Pulau Lombok, Nusa Tenggara Barat. Banyak dipengaruhi oleh penyebaran agama Islam, menceritakan kisah-kisah Serat Menak dengan tokoh utama Amir Hamzah.',
       'tag': 'KULIT (LOMBOK)',
+      'image': 'assets/images/ui/jenis_wayang/wayang_sasak.webp',
     },
   ];
 
@@ -141,6 +151,7 @@ class _JenisWayangScreenState extends State<JenisWayangScreen> {
                   title: jenis['title']!,
                   description: jenis['description']!,
                   tag: jenis['tag']!,
+                  image: jenis['image'],
                 )).toList(),
               ),
             ),
@@ -155,6 +166,7 @@ class _JenisWayangScreenState extends State<JenisWayangScreen> {
     required String title,
     required String description,
     required String tag,
+    String? image,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -175,18 +187,41 @@ class _JenisWayangScreenState extends State<JenisWayangScreen> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(11)),
                 border: Border(bottom: BorderSide(color: AppColors.accent, width: 1)),
               ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.image_outlined, color: AppColors.accent, size: 40),
-                    const SizedBox(height: 8),
-                    Text(
-                      '(Gambar $title)',
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.secondary),
-                    )
-                  ],
-                ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+                child: image != null
+                    ? Image.asset(
+                        image,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.image_outlined, color: AppColors.accent, size: 40),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '(Gambar $title)',
+                                  style: AppTypography.bodySmall.copyWith(color: AppColors.secondary),
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.image_outlined, color: AppColors.accent, size: 40),
+                            const SizedBox(height: 8),
+                            Text(
+                              '(Gambar $title)',
+                              style: AppTypography.bodySmall.copyWith(color: AppColors.secondary),
+                            )
+                          ],
+                        ),
+                      ),
               ),
             ),
           ),

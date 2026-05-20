@@ -22,11 +22,25 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 4,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
   }
 
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE users ADD COLUMN email TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN bio TEXT');
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE users ADD COLUMN foto_profil TEXT');
+    }
+    if (oldVersion < 4) {
+      await db.execute('DROP TABLE IF EXISTS level_unlocked');
+      await db.execute('DROP TABLE IF EXISTS faq_mahabharata');
+    }
+  }
 
   Future _createDB(Database db, int version) async {
     // 1. users
@@ -36,6 +50,9 @@ class DatabaseHelper {
         username TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
         nama_lengkap TEXT,
+        email TEXT,
+        bio TEXT,
+        foto_profil TEXT,
         created_at TEXT DEFAULT (datetime('now'))
       )
     ''');
@@ -97,17 +114,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // 6. level_unlocked
-    await db.execute('''
-      CREATE TABLE level_unlocked (
-        user_id INTEGER,
-        level INTEGER,
-        skor_terbaik INTEGER DEFAULT 0,
-        PRIMARY KEY (user_id, level),
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      )
-    ''');
-
     // 8. serat_mahabharata
     await db.execute('''
       CREATE TABLE serat_mahabharata (
@@ -116,16 +122,6 @@ class DatabaseHelper {
         nama_babak TEXT NOT NULL,
         isi_narasi TEXT NOT NULL,
         parwa_id INTEGER,
-        urutan INTEGER
-      )
-    ''');
-
-    // 9. faq_mahabharata
-    await db.execute('''
-      CREATE TABLE faq_mahabharata (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        pertanyaan TEXT NOT NULL,
-        jawaban TEXT NOT NULL,
         urutan INTEGER
       )
     ''');
@@ -184,19 +180,12 @@ class DatabaseHelper {
       whereArgs: [userId],
     );
 
-    final levelsUnlocked = await db.query(
-      'level_unlocked',
-      where: 'user_id = ?',
-      whereArgs: [userId],
-    );
-
     return {
       'version': 1,
       'exported_at': DateTime.now().toIso8601String(),
       'user_koleksi': collections,
       'progres_kuis': kuisProgress,
       'progres_narasi': narasiProgress,
-      'level_unlocked': levelsUnlocked,
     };
   }
 
@@ -208,18 +197,21 @@ class DatabaseHelper {
       await txn.delete('user_koleksi', where: 'user_id = ?', whereArgs: [userId]);
       await txn.delete('progres_kuis', where: 'user_id = ?', whereArgs: [userId]);
       await txn.delete('progres_narasi', where: 'user_id = ?', whereArgs: [userId]);
-      await txn.delete('level_unlocked', where: 'user_id = ?', whereArgs: [userId]);
 
       // 2. Restore user_koleksi
       if (backupData['user_koleksi'] != null) {
         final List<dynamic> collections = backupData['user_koleksi'];
         for (var item in collections) {
-          if (item is Map<String, dynamic>) {
-            await txn.insert('user_koleksi', {
-              'user_id': userId,
-              'kartu_id': item['kartu_id'],
-              'unlocked_at': item['unlocked_at'],
-            });
+          if (item is Map<String, dynamic> && item['kartu_id'] != null) {
+            await txn.insert(
+              'user_koleksi',
+              {
+                'user_id': userId,
+                'kartu_id': item['kartu_id'],
+                'unlocked_at': item['unlocked_at'],
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
           }
         }
       }
@@ -228,14 +220,18 @@ class DatabaseHelper {
       if (backupData['progres_kuis'] != null) {
         final List<dynamic> kuis = backupData['progres_kuis'];
         for (var item in kuis) {
-          if (item is Map<String, dynamic>) {
-            await txn.insert('progres_kuis', {
-              'user_id': userId,
-              'level': item['level'],
-              'skor': item['skor'],
-              'total_soal': item['total_soal'],
-              'dikerjakan_pada': item['dikerjakan_pada'],
-            });
+          if (item is Map<String, dynamic> && item['level'] != null && item['skor'] != null) {
+            await txn.insert(
+              'progres_kuis',
+              {
+                'user_id': userId,
+                'level': item['level'],
+                'skor': item['skor'],
+                'total_soal': item['total_soal'] ?? 10,
+                'dikerjakan_pada': item['dikerjakan_pada'],
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
           }
         }
       }
@@ -244,26 +240,16 @@ class DatabaseHelper {
       if (backupData['progres_narasi'] != null) {
         final List<dynamic> narasi = backupData['progres_narasi'];
         for (var item in narasi) {
-          if (item is Map<String, dynamic>) {
-            await txn.insert('progres_narasi', {
-              'user_id': userId,
-              'babak_id': item['babak_id'],
-              'sudah_dibaca': item['sudah_dibaca'],
-            });
-          }
-        }
-      }
-
-      // 5. Restore level_unlocked
-      if (backupData['level_unlocked'] != null) {
-        final List<dynamic> levels = backupData['level_unlocked'];
-        for (var item in levels) {
-          if (item is Map<String, dynamic>) {
-            await txn.insert('level_unlocked', {
-              'user_id': userId,
-              'level': item['level'],
-              'skor_terbaik': item['skor_terbaik'],
-            });
+          if (item is Map<String, dynamic> && item['babak_id'] != null) {
+            await txn.insert(
+              'progres_narasi',
+              {
+                'user_id': userId,
+                'babak_id': item['babak_id'],
+                'sudah_dibaca': item['sudah_dibaca'] ?? 0,
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
           }
         }
       }

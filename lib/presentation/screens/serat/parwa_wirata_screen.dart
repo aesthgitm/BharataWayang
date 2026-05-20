@@ -36,6 +36,7 @@ class _ParwaWirataScreenState extends State<ParwaWirataScreen> {
       final userId = authProvider.currentUser?.id;
       if (userId != null) {
         narasiProvider.loadProgres(userId);
+        narasiProvider.loadParwa('Wirataparwa');
         if (koleksiProvider.semuaKartu.isEmpty) {
           koleksiProvider.loadData(userId);
         }
@@ -223,6 +224,10 @@ class _ParwaWirataScreenState extends State<ParwaWirataScreen> {
     final sudahSelesai =
         _sudahSelesai || narasiProvider.isBabakSelesai(_parwaId);
 
+    final hasData = narasiProvider.parwaAktif.isNotEmpty &&
+        narasiProvider.parwaAktif.first.namaParwa == 'Wirataparwa';
+    final paragraphs = hasData ? narasiProvider.parwaAktif.first.isiNarasi.split('\n\n') : <String>[];
+
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: AppBar(
@@ -256,32 +261,6 @@ class _ParwaWirataScreenState extends State<ParwaWirataScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // White Box with Gunungan Image (Placeholder)
-              Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Image.asset(
-                  'assets/images/ui/digital_gunungan_nobg.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(height: 24),
               Text(
                 'PARWA IV',
                 style: AppTypography.labelText.copyWith(
@@ -323,26 +302,38 @@ class _ParwaWirataScreenState extends State<ParwaWirataScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Content Paragraphs
-              _buildStoryParagraph(
-                'Untuk merebut kekayaan dan kerajaan Yudistira, Duryudana mengundang Yudistira untuk bermain permainan dadu, ini atas ide dari Arya Sengkuni. Pada saat permainan dadu, Duryudana diwakili oleh Sengkuni sebagai bandar dadu yang memiliki kesaktian untuk berbuat curang.  Permulaan permainan taruhan senjata perang, taruhan pemainan terus  meningkat menjadi taruhan harta kerajaan, selanjutnya prajurit  dipertaruhkan, dan sampai pada puncak permainan Kerajaan menjadi  taruhan, Pandawa kalah habislah semua harta dan kerajaan Pandawa  termasuk saudara juga dipertaruhkan dan yang terakhir istrinya Drupadi  dijadikan taruhan. Akhirnya Yudistira kalah dan Drupadi diminta untuk hadir di arena judi  karena sudah menjadi milik Duryudana.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Duryudana mengutus para  pengawalnya untuk menjemput Drupadi, namun Drupadi menolak. Setelah  gagal, Duryudana menyuruh Dursasana adiknya, untuk menjemput Drupadi. Drupadi yang menolak untuk datang,  diseret oleh Dursasana yang tidak memiliki rasa kemanusiaan. Rambutnya  ditarik sampai ke arena judi, tempat suami dan para iparnya berkumpul.  Karena sudah kalah, Yudistira dan seluruh adiknya diminta untuk  menanggalkan bajunya, namun Drupadi menolak. Dursasana yang berwatak  kasar, menarik kain yang dipakai Drupadi, namun kain tersebut  terulur-ulur terus dan tak habis-habis karena mendapat kekuatan gaib  dari Sri Kresna yang melihat Dropadi dalam bahaya. Pertolongan Sri Kresna disebabkan  karena perbuatan Dropadi yang membalut luka Sri Kresna pada saat upacara  Rajasuya di Indraprastha.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Drupadi yang merasa malu dan tersinggung oleh sikap Dursasana bersumpah tidak akan menggelung rambutnya sebelum dikramasi dengan darah Dursasana. Bima pun bersumpah akan membunuh Dursasana dan meminum darahnya kelak. Setelah mengucapkan sumpah tersebut, Drestarastra merasa bahwa malapetaka akan menimpa keturunannya, maka ia mengembalikan segala harta Yudistira yang dijadikan taruhan.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Duryudana yang merasa kecewa karena Drestarastra telah mengembalikan semua harta yang sebenarnya akan menjadi miliknya,  menyelenggarakan permainan dadu untuk yang kedua kalinya. Kali ini,  siapa yang kalah harus mengasingkan diri ke hutan selama 12 tahun,  setelah itu hidup dalam masa penyamaran selama setahun, dan setelah itu  berhak kembali lagi ke kerajaannya. Untuk yang kedua kalinya, Yudistira mengikuti permainan tersebut dan sekali lagi ia kalah. Karena kekalahan tersebut, Pandawa terpaksa meninggalkan kerajaan mereka selama 12 tahun dan hidup dalam masa penyamaran selama setahun.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Setelah masa pengasingan habis dan sesuai dengan perjanjian yang sah, Pandawa berhak untuk mengambil alih kembali kerajaan yang dipimpin Duryudana. Namun Duryudana bersifat jahat. Ia tidak mau menyerahkan kerajaan kepada Pandawa, walau seluas ujung jarum pun. Hal itu membuat kesabaran Pandawa habis. Misi damai dilakukan oleh Sri Kresna, namun berkali-kali gagal. Akhirnya, pertempuran tidak dapat dielakkan lagi.',
-              ),
+              // Content Paragraphs - Loaded Dynamically
+              if (narasiProvider.isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: CircularProgressIndicator(color: AppColors.accent),
+                  ),
+                )
+              else if (paragraphs.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: Text(
+                      'Memuat cerita...',
+                      style: TextStyle(color: AppColors.textDark),
+                    ),
+                  ),
+                )
+              else
+                ...List.generate(paragraphs.length, (index) {
+                  final paragraph = paragraphs[index];
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: _buildDroppedCapParagraph(paragraph),
+                    );
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: _buildStoryParagraph(paragraph),
+                  );
+                }),
 
               const SizedBox(height: 40),
               SvgPicture.asset(
@@ -390,6 +381,46 @@ class _ParwaWirataScreenState extends State<ParwaWirataScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDroppedCapParagraph(String text) {
+    if (text.isEmpty) return const SizedBox.shrink();
+    final String firstLetter = text.substring(0, 1);
+    final String remainingText = text.substring(1);
+
+    return RichText(
+      textAlign: TextAlign.justify,
+      text: TextSpan(
+        style: AppTypography.bodyLarge.copyWith(
+          color: AppColors.textDark.withValues(alpha: 0.8),
+          height: 1.6,
+        ),
+        children: [
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: Container(
+              margin: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withValues(alpha: 0.1),
+                border: Border.all(color: AppColors.accent, width: 1.5),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                firstLetter,
+                style: GoogleFonts.cinzel(
+                  color: AppColors.accent,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          TextSpan(text: remainingText),
+        ],
       ),
     );
   }

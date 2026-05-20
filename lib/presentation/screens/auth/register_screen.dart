@@ -32,7 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final success = await authProvider.register(
-        _emailController.text.trim(), // Using email as username for auth
+        _emailController.text.trim(), // Registrasi menggunakan email
         _passwordController.text,
         _namaController.text.trim(),
       );

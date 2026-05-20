@@ -1,10 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../providers/kuis_provider.dart';
 import 'kuis_game_screen.dart';
 
-class KuisHomeScreen extends StatelessWidget {
+class KuisHomeScreen extends StatefulWidget {
   const KuisHomeScreen({super.key});
+
+  @override
+  State<KuisHomeScreen> createState() => _KuisHomeScreenState();
+}
+
+class _KuisHomeScreenState extends State<KuisHomeScreen> {
+  Map<int, int> _highScores = {};
+  bool _isLoadingScores = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHighScores();
+  }
+
+  Future<void> _loadHighScores() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userId = authProvider.currentUser?.id;
+    if (userId != null) {
+      final kuisProvider = Provider.of<KuisProvider>(context, listen: false);
+      final Map<int, int> scores = {};
+      for (int l = 1; l <= 5; l++) {
+        final score = await kuisProvider.getSkorTertinggi(userId, l);
+        scores[l] = score;
+      }
+      if (mounted) {
+        setState(() {
+          _highScores = scores;
+          _isLoadingScores = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoadingScores = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,126 +77,132 @@ class KuisHomeScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'KUIS INTERAKTIF',
-                style: AppTypography.headingLarge.copyWith(
-                  color: AppColors.textDark,
-                  letterSpacing: 2,
-                  fontSize: 28,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'PILIH TINGKAT KESULITAN KUIS',
-                style: AppTypography.labelText.copyWith(
+        child: _isLoadingScores
+            ? const Center(
+                child: CircularProgressIndicator(
                   color: AppColors.primary,
-                  letterSpacing: 1,
-                  fontWeight: FontWeight.w600,
+                ),
+              )
+            : SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'KUIS INTERAKTIF',
+                      style: AppTypography.headingLarge.copyWith(
+                        color: AppColors.textDark,
+                        letterSpacing: 2,
+                        fontSize: 28,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'PILIH TINGKAT KESULITAN KUIS',
+                      style: AppTypography.labelText.copyWith(
+                        color: AppColors.primary,
+                        letterSpacing: 1,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Pembatas Berlian
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(child: Container(height: 1, color: AppColors.accent.withValues(alpha: 0.5))),
+                        const SizedBox(width: 16),
+                        const Icon(Icons.diamond_outlined, color: AppColors.accent, size: 16),
+                        const SizedBox(width: 16),
+                        Expanded(child: Container(height: 1, color: AppColors.accent.withValues(alpha: 0.5))),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Level 1: Dalang Pemula
+                    _buildLevelCard(
+                      context,
+                      level: 1,
+                      title: 'DALANG PEMULA',
+                      subtitle: 'Pengenalan dasar pewayangan',
+                      isCompleted: (_highScores[1] ?? 0) > 0,
+                      icon: Icons.sports_martial_arts,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Level 2: Dalang Dasar
+                    _buildLevelCard(
+                      context,
+                      level: 2,
+                      title: 'DALANG DASAR',
+                      subtitle: 'Silsilah Pandawa & Kurawa',
+                      isCompleted: (_highScores[2] ?? 0) > 0,
+                      icon: Icons.shield_outlined,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Level 3: Dalang Handal
+                    _buildLevelCard(
+                      context,
+                      level: 3,
+                      title: 'DALANG HANDAL',
+                      subtitle: 'Konflik & Pengasingan',
+                      isCompleted: (_highScores[3] ?? 0) > 0,
+                      icon: Icons.shield_outlined,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Level 4: Dalang Mahir
+                    _buildLevelCard(
+                      context,
+                      level: 4,
+                      title: 'DALANG MAHIR',
+                      subtitle: 'Perang Bharatayuda',
+                      isCompleted: (_highScores[4] ?? 0) > 0,
+                      icon: Icons.shield_outlined,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Level 5: Dalang Maestro
+                    _buildLevelCard(
+                      context,
+                      level: 5,
+                      title: 'DALANG MAESTRO',
+                      subtitle: 'Filosofi & Nilai Moral',
+                      isCompleted: (_highScores[5] ?? 0) > 0,
+                      icon: Icons.local_fire_department,
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Tombol Kembali
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.exit_to_app, size: 18),
+                        label: Text(
+                          'KEMBALI',
+                          style: AppTypography.buttonText.copyWith(
+                            color: AppColors.textDark,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: const BorderSide(color: AppColors.textDark),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 40),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              // Pembatas Berlian
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(child: Container(height: 1, color: AppColors.accent.withValues(alpha: 0.5))),
-                  const SizedBox(width: 16),
-                  const Icon(Icons.diamond_outlined, color: AppColors.accent, size: 16),
-                  const SizedBox(width: 16),
-                  Expanded(child: Container(height: 1, color: AppColors.accent.withValues(alpha: 0.5))),
-                ],
-              ),
-              const SizedBox(height: 32),
-
-              // Level 1: Dalang Pemula
-              _buildLevelCard(
-                context,
-                level: 1,
-                title: 'DALANG PEMULA',
-                subtitle: 'Pengenalan dasar pewayangan',
-                isCompleted: false,
-                icon: Icons.sports_martial_arts,
-              ),
-              const SizedBox(height: 16),
-
-              // Level 2: Dalang Dasar
-              _buildLevelCard(
-                context,
-                level: 2,
-                title: 'DALANG DASAR',
-                subtitle: 'Silsilah Pandawa & Kurawa',
-                isCompleted: false,
-                icon: Icons.shield_outlined,
-              ),
-              const SizedBox(height: 16),
-
-              // Level 3: Dalang Handal
-              _buildLevelCard(
-                context,
-                level: 3,
-                title: 'DALANG HANDAL',
-                subtitle: 'Konflik & Pengasingan',
-                isCompleted: false,
-                icon: Icons.shield_outlined,
-              ),
-              const SizedBox(height: 16),
-
-              // Level 4: Dalang Mahir
-              _buildLevelCard(
-                context,
-                level: 4,
-                title: 'DALANG MAHIR',
-                subtitle: 'Perang Bharatayuda',
-                isCompleted: false,
-                icon: Icons.shield_outlined,
-              ),
-              const SizedBox(height: 16),
-
-              // Level 5: Dalang Maestro
-              _buildLevelCard(
-                context,
-                level: 5,
-                title: 'DALANG MAESTRO',
-                subtitle: 'Filosofi & Nilai Moral',
-                isCompleted: false,
-                icon: Icons.local_fire_department,
-              ),
-
-              const SizedBox(height: 32),
-
-              // Tombol Kembali
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.exit_to_app, size: 18),
-                  label: Text(
-                    'KEMBALI',
-                    style: AppTypography.buttonText.copyWith(
-                      color: AppColors.textDark,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: const BorderSide(color: AppColors.textDark),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -167,6 +215,7 @@ class KuisHomeScreen extends StatelessWidget {
     required bool isCompleted,
     required IconData icon,
   }) {
+    final score = _highScores[level] ?? 0;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -212,25 +261,38 @@ class KuisHomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            '10 Pertanyaan',
-            style: AppTypography.labelText.copyWith(
-              color: isCompleted ? AppColors.accent : AppColors.primary,
-              fontWeight: FontWeight.bold,
-              fontSize: 10,
-              letterSpacing: 1.5,
+          if (isCompleted) ...[
+            Text(
+              'SKOR TERTINGGI: $score',
+              style: AppTypography.labelText.copyWith(
+                color: AppColors.accent,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                letterSpacing: 1.5,
+              ),
             ),
-          ),
+          ] else ...[
+            Text(
+              '10 Pertanyaan',
+              style: AppTypography.labelText.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           SizedBox(
             width: 140,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
+              onPressed: () async {
+                await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => KuisGameScreen(level: level),
                   ),
                 );
+                _loadHighScores();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: isCompleted ? Colors.transparent : AppColors.accent,
@@ -243,8 +305,9 @@ class KuisHomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 10),
               ),
               child: Text(
-                isCompleted ? 'SELESAI' : 'MULAI',
+                isCompleted ? 'COBA LAGI' : 'MULAI',
                 style: AppTypography.buttonText.copyWith(
+                  color: isCompleted ? AppColors.accent : AppColors.primary,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,
                 ),

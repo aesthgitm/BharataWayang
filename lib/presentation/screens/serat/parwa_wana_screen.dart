@@ -36,6 +36,7 @@ class _ParwaWanaScreenState extends State<ParwaWanaScreen> {
       final userId = authProvider.currentUser?.id;
       if (userId != null) {
         narasiProvider.loadProgres(userId);
+        narasiProvider.loadParwa('Wanaparwa');
         if (koleksiProvider.semuaKartu.isEmpty) {
           koleksiProvider.loadData(userId);
         }
@@ -223,6 +224,10 @@ class _ParwaWanaScreenState extends State<ParwaWanaScreen> {
     final sudahSelesai =
         _sudahSelesai || narasiProvider.isBabakSelesai(_parwaId);
 
+    final hasData = narasiProvider.parwaAktif.isNotEmpty &&
+        narasiProvider.parwaAktif.first.namaParwa == 'Wanaparwa';
+    final paragraphs = hasData ? narasiProvider.parwaAktif.first.isiNarasi.split('\n\n') : <String>[];
+
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: AppBar(
@@ -256,32 +261,6 @@ class _ParwaWanaScreenState extends State<ParwaWanaScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // White Box with Gunungan Image (Placeholder)
-              Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Image.asset(
-                  'assets/images/ui/digital_gunungan_nobg.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-              const SizedBox(height: 24),
               Text(
                 'PARWA III',
                 style: AppTypography.labelText.copyWith(
@@ -323,34 +302,38 @@ class _ParwaWanaScreenState extends State<ParwaWanaScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Content Paragraphs
-              _buildStoryParagraph(
-                'Pada suatu ketika, Duryudana mengundang Kunti dan para Pandawa   untuk liburan. Di sana mereka menginap di sebuah rumah yang sudah  disediakan oleh Duryudana. Pada malam hari, rumah itu dibakar. Namun  para Pandawa bisa diselamatkan oleh  Bima yang telah diberitahu oleh Widura akan kelicikan Kurawa sehingga mereka tidak terbakar hidup-hidup dalam rumah tersebut. Usai  menyelamatkan diri, Pandawa dan Kunti masuk hutan. (diceritakan dalam lakon Bale Sigala-gala).',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Di hutan tersebut  Bima bertemu dengan raksasa bernama Arimba yang ingin membalas dendam kematian Ayahnya yaitu Arimbaka (dalam pedalangan Jawa disebut Trembaka), Bima unggul dan membunuhnya, lalu menikahi adiknya, yaitu raseksi Hidimbi atau Arimbi yang jatuh hati pada Bima. Dari pernikahan tersebut, lahirlah Gatotkaca.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Setelah melewati hutan rimba, Pandawa melewati Kerajaan Pancala. Di sana tersiar kabar bahwa Raja Drupada menyelenggarakan sayembara memperebutkan Dewi Drupadi. Adipati Karna mengikuti sayembara tersebut, tetapi ditolak oleh Drupadi. Pandawa pun  turut serta menghadiri sayembara itu, namun mereka berpakaian seperti  kaum brahmana.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Pandawa ikut sayembara untuk memenangkan lima macam sayembara, Yudistira untuk memenangkan sayembara filsafat dan tatanegara, Arjuna memenangkan sayembara senjata Panah, Bima memenangkan sayembara Gada dan Nakula Sadewa memenangkan sayembara senjata Pedang. Pandawa berhasil melakukannya dengan baik untuk memenangkan sayembara.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Drupadi harus menerima Pandawa sebagai suami-suaminya karena sesuai  janjinya siapa yang dapat memenangkan sayembara yang dibuatnya itu akan  jadi suaminya walau menyimpang dari keinginannya yaitu sebenarnya yang  diinginkan hanya seorang Satriya.',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Setelah itu perkelahian terjadi karena para hadirin menggerutu sebab  kaum brahmana tidak selayaknya mengikuti sayembara. Pandawa berkelahi  kemudian meloloskan diri. sesampainya di rumah, mereka berkata kepada  ibunya bahwa mereka datang membawa hasil meminta-minta. Ibu mereka pun  menyuruh agar hasil tersebut dibagi rata untuk seluruh saudaranya.  Namun, betapa terkejutnya ia saat melihat bahwa anak-anaknya tidak hanya  membawa hasil meminta-minta, namun juga seorang wanita. (Dalam Pedalangan Jawa Drupadi hanya menjadi istri Yudistira / Puntadewa seorang).',
-              ),
-              const SizedBox(height: 16),
-              _buildStoryParagraph(
-                'Agar tidak terjadi pertempuran sengit, Kerajaan Kuru dibagi dua untuk dibagi kepada Pandawa dan Kurawa. Kurawa memerintah Kerajaan Kuru induk (pusat) dengan ibukota Hastinapura, sementara Pandawa memerintah Kerajaan Kurujanggala dengan ibukota Indraprastha. Baik Hastinapura maupun Indraprastha memiliki istana megah, dan di sanalah Duryudana tercebur ke dalam kolam yang ia kira sebagai lantai, sehingga dirinya menjadi bahan ejekan bagi Drupadi. Hal tersebut membuatnya bertambah marah kepada para Pandawa.',
-              ),
+              // Content Paragraphs - Loaded Dynamically
+              if (narasiProvider.isLoading)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: CircularProgressIndicator(color: AppColors.accent),
+                  ),
+                )
+              else if (paragraphs.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40.0),
+                    child: Text(
+                      'Memuat cerita...',
+                      style: TextStyle(color: AppColors.textDark),
+                    ),
+                  ),
+                )
+              else
+                ...List.generate(paragraphs.length, (index) {
+                  final paragraph = paragraphs[index];
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: _buildDroppedCapParagraph(paragraph),
+                    );
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: _buildStoryParagraph(paragraph),
+                  );
+                }),
 
               const SizedBox(height: 40),
               SvgPicture.asset(
@@ -398,6 +381,46 @@ class _ParwaWanaScreenState extends State<ParwaWanaScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDroppedCapParagraph(String text) {
+    if (text.isEmpty) return const SizedBox.shrink();
+    final String firstLetter = text.substring(0, 1);
+    final String remainingText = text.substring(1);
+
+    return RichText(
+      textAlign: TextAlign.justify,
+      text: TextSpan(
+        style: AppTypography.bodyLarge.copyWith(
+          color: AppColors.textDark.withValues(alpha: 0.8),
+          height: 1.6,
+        ),
+        children: [
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: Container(
+              margin: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withValues(alpha: 0.1),
+                border: Border.all(color: AppColors.accent, width: 1.5),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                firstLetter,
+                style: GoogleFonts.cinzel(
+                  color: AppColors.accent,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          TextSpan(text: remainingText),
+        ],
       ),
     );
   }

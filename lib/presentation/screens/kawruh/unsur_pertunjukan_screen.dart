@@ -85,7 +85,7 @@ class UnsurPertunjukanScreen extends StatelessWidget {
 
               // DALANG CARD (Puppeteer)
               _buildStaticCard(
-                imagePath: 'assets/images/ui/dalang_illustration.png',
+                imagePath: 'assets/images/ui/unsur_pertunjukan/dalang_illustration.webp',
                 title: 'DALANG',
                 subtitle: 'Sang Pengendali Bayangan',
                 description: 'Sang narator utama dan konduktor pertunjukan. Dalang memberikan kehidupan pada bayangan-bayangan kulit, menyalurkan roh para pahlawan dan tokoh antagonis melalui suara, gerakan, dan kebijaksanaan kuno.',
@@ -94,7 +94,7 @@ class UnsurPertunjukanScreen extends StatelessWidget {
 
               // GAMELAN CARD (Musical Ensemble)
               _buildStaticCard(
-                imagePath: 'assets/images/ui/gamelan_illustration.png',
+                imagePath: 'assets/images/ui/unsur_pertunjukan/gamelan_illustration.webp',
                 title: 'GAMELAN',
                 subtitle: 'Ansambel Musik',
                 description: 'Ansambel instrumen tradisional yang mengiringi pertunjukan, menentukan suasana hati, tempo, dan resonansi emosional dari setiap adegan melalui ritme perkusi yang kompleks.',
@@ -103,7 +103,7 @@ class UnsurPertunjukanScreen extends StatelessWidget {
 
               // CEMPALA CARD (Wooden mallet)
               _buildStaticCard(
-                imagePath: 'assets/images/ui/cempala_illustration.png',
+                imagePath: 'assets/images/ui/unsur_pertunjukan/cempala_illustration.webp',
                 title: 'CEMPALA',
                 subtitle: 'Ketukan Sutradara',
                 description: 'Sebuah palu kayu kecil yang digunakan oleh Dalang untuk mengetuk kotak wayang, memberikan isyarat ritmis kepada gamelan dan menciptakan efek suara dramatis.',
@@ -112,7 +112,7 @@ class UnsurPertunjukanScreen extends StatelessWidget {
 
               // KELIR CARD (Screen/Canvas)
               _buildStaticCard(
-                imagePath: 'assets/images/ui/kelir_illustration.png',
+                imagePath: 'assets/images/ui/unsur_pertunjukan/kelir_illustration.webp',
                 title: 'KELIR',
                 subtitle: 'Layar Kosmik',
                 description: 'Layar kanvas putih yang melambangkan alam semesta. Saat diterangi oleh blencong (lampu minyak), kelir menjadi panggung di mana bayangan berubah menjadi legenda hidup.',
@@ -121,7 +121,7 @@ class UnsurPertunjukanScreen extends StatelessWidget {
 
               // BLENCONG CARD (Oil lamp)
               _buildStaticCard(
-                imagePath: 'assets/images/ui/blencong_illustration.png',
+                imagePath: 'assets/images/ui/unsur_pertunjukan/blencong_illustration.webp',
                 title: 'BLENCONG',
                 subtitle: 'Matahari Purba',
                 description: 'Lampu minyak perunggu tradisional berbentuk seperti burung yang digantung di belakang layar. Nyala apinya yang berkedip-kedip memberikan kualitas bayangan yang bergetar seakan bernapas.',
@@ -130,7 +130,7 @@ class UnsurPertunjukanScreen extends StatelessWidget {
 
               // KOTAK CARD (Wayang chest/box)
               _buildStaticCard(
-                imagePath: 'assets/images/ui/kotak_illustration.png',
+                imagePath: 'assets/images/ui/unsur_pertunjukan/kotak_illustration.webp',
                 title: 'KOTAK',
                 subtitle: 'Peti Dunia',
                 description: 'Peti kayu besar tempat wayang bersemayam. Kotak melambangkan dunia bawah atau kekosongan sebelum penciptaan, dari mana semua karakter muncul dan akhirnya kembali.',

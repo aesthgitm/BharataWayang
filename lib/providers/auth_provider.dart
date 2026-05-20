@@ -20,14 +20,14 @@ class AuthProvider with ChangeNotifier {
     return sha256.convert(bytes).toString();
   }
 
-  Future<bool> login(String username, String password) async {
+  Future<bool> login(String email, String password) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       final hashedPassword = _hashPassword(password);
-      final user = await _authRepository.login(username, hashedPassword);
+      final user = await _authRepository.login(email, hashedPassword);
 
       if (user != null) {
         _currentUser = user;
@@ -35,7 +35,7 @@ class AuthProvider with ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        _errorMessage = 'Username atau password salah';
+        _errorMessage = 'Email atau password salah';
         _isLoading = false;
         notifyListeners();
         return false;
@@ -48,14 +48,14 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> register(String username, String password, String namaLengkap) async {
+  Future<bool> register(String email, String password, String namaLengkap) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       final hashedPassword = _hashPassword(password);
-      final user = await _authRepository.register(username, hashedPassword, namaLengkap);
+      final user = await _authRepository.register(email, hashedPassword, namaLengkap);
 
       if (user != null) {
         _currentUser = user;
@@ -77,13 +77,13 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> updateProfile(String namaLengkap) async {
+  Future<bool> updateProfile(String namaLengkap, String? email, String? bio, String? fotoProfil) async {
     if (_currentUser == null) return false;
     _isLoading = true;
     notifyListeners();
 
     try {
-      final updatedUser = await _authRepository.updateProfile(_currentUser!.id!, namaLengkap);
+      final updatedUser = await _authRepository.updateProfile(_currentUser!.id!, namaLengkap, email, bio, fotoProfil);
       if (updatedUser != null) {
         _currentUser = updatedUser;
         _isLoading = false;

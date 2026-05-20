@@ -56,8 +56,11 @@ flutter:
   assets:
     - assets/images/backgrounds/
     - assets/images/ui/
+    - assets/images/ui/jenis_wayang/
+    - assets/images/ui/unsur_pertunjukan/
     - assets/wayang/
     - assets/icons/
+    - assets/photoprofile/
 
   fonts:
     - family: Cinzel

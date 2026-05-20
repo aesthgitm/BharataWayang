@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../widgets/profile_image.dart';
 
 class KelolaProfilScreen extends StatefulWidget {
   const KelolaProfilScreen({super.key});
@@ -15,14 +19,16 @@ class _KelolaProfilScreenState extends State<KelolaProfilScreen> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _bioController;
+  String? _selectedAvatarPath;
 
   @override
   void initState() {
     super.initState();
     final user = context.read<AuthProvider>().currentUser;
     _nameController = TextEditingController(text: user?.namaLengkap ?? user?.username ?? "Arjuna Dananjaya");
-    _emailController = TextEditingController(text: "arjuna@pandawa.id");
-    _bioController = TextEditingController(text: "Ksatria Pandawa • Penikmat Serat");
+    _emailController = TextEditingController(text: user?.email ?? "arjuna@pandawa.id");
+    _bioController = TextEditingController(text: user?.bio ?? "Ksatria Pandawa • Penikmat Serat");
+    _selectedAvatarPath = user?.fotoProfil;
   }
 
   @override
@@ -33,8 +39,54 @@ class _KelolaProfilScreenState extends State<KelolaProfilScreen> {
     super.dispose();
   }
 
+  Future<void> _uploadProfilePicture() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'webp'],
+        allowMultiple: false,
+      );
+
+      if (result != null && result.files.single.path != null) {
+        final String pickedFilePath = result.files.single.path!;
+        final File pickedFile = File(pickedFilePath);
+        final String fileName = result.files.single.name;
+
+        // Tentukan folder penyimpanan lokal assets/photoprofile di App Documents Directory
+        final Directory appDir = await getApplicationDocumentsDirectory();
+        final Directory targetDir = Directory('${appDir.path}/assets/photoprofile');
+        if (!await targetDir.exists()) {
+          await targetDir.create(recursive: true);
+        }
+
+        final String targetPath = '${targetDir.path}/$fileName';
+        await pickedFile.copy(targetPath);
+
+        setState(() {
+          _selectedAvatarPath = fileName; // Hanya menyimpan nama berkasnya saja
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Foto profil berhasil diunggah!')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal mengunggah foto profil: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().currentUser;
     return Scaffold(
       backgroundColor: AppColors.secondary,
       appBar: AppBar(
@@ -69,56 +121,64 @@ class _KelolaProfilScreenState extends State<KelolaProfilScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Avatar with Edit Badge
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomRight,
-                children: [
-                  Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.accent, width: 3),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Image.asset(
-                          'assets/images/ui/digital_gunungan_nobg.png',
-                          fit: BoxFit.contain,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 4,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
+              GestureDetector(
+                onTap: _uploadProfilePicture,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 120,
                       decoration: BoxDecoration(
-                        color: AppColors.accent,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.secondary, width: 2),
+                        border: Border.all(color: AppColors.accent, width: 3),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: const Icon(Icons.edit, color: AppColors.primary, size: 16),
+                      child: ClipOval(
+                        child: ProfileImage(
+                          fotoProfil: _selectedAvatarPath,
+                          size: 120,
+                          fit: BoxFit.cover,
+                          placeholder: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.asset(
+                              'assets/images/ui/digital_gunungan_nobg.png',
+                              fit: BoxFit.contain,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    Positioned(
+                      bottom: 0,
+                      right: 4,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.accent,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.secondary, width: 2),
+                        ),
+                        child: const Icon(Icons.edit, color: AppColors.primary, size: 16),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 24),
               
               // Nama
               Text(
-                'RADEN ARJUNA',
+                (user?.namaLengkap ?? user?.username ?? 'RADEN ARJUNA').toUpperCase(),
                 style: AppTypography.headingLarge.copyWith(
                   color: AppColors.textDark,
                   letterSpacing: 2,
@@ -149,18 +209,21 @@ class _KelolaProfilScreenState extends State<KelolaProfilScreen> {
                   children: [
                     _buildFormField(
                       label: 'NAMA LENGKAP',
+                      hintText: 'Masukkan nama lengkap Anda',
                       icon: Icons.badge_outlined,
                       controller: _nameController,
                     ),
                     const SizedBox(height: 24),
                     _buildFormField(
                       label: 'EMAIL',
+                      hintText: 'Masukkan alamat email Anda',
                       icon: Icons.email_outlined,
                       controller: _emailController,
                     ),
                     const SizedBox(height: 24),
                     _buildFormField(
                       label: 'BIO',
+                      hintText: 'Tulis biografi singkat Anda',
                       icon: Icons.military_tech_outlined,
                       controller: _bioController,
                     ),
@@ -171,7 +234,12 @@ class _KelolaProfilScreenState extends State<KelolaProfilScreen> {
                     ElevatedButton.icon(
                       onPressed: () async {
                         final authProvider = context.read<AuthProvider>();
-                        final success = await authProvider.updateProfile(_nameController.text);
+                        final success = await authProvider.updateProfile(
+                          _nameController.text,
+                          _emailController.text,
+                          _bioController.text,
+                          _selectedAvatarPath,
+                        );
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -214,6 +282,7 @@ class _KelolaProfilScreenState extends State<KelolaProfilScreen> {
 
   Widget _buildFormField({
     required String label,
+    required String hintText,
     required IconData icon,
     required TextEditingController controller,
   }) {
@@ -234,18 +303,29 @@ class _KelolaProfilScreenState extends State<KelolaProfilScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 8),
         TextField(
           controller: controller,
-          style: AppTypography.bodyLarge.copyWith(color: AppColors.textDark),
+          style: AppTypography.bodyLarge.copyWith(
+            color: AppColors.dark, // Saat user input, teks jadi lebih gelap lagi
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(vertical: 8),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.accent.withValues(alpha: 0.5)),
+            filled: true,
+            fillColor: Colors.white, // Input field berwarna terang (putih)
+            hintText: hintText,
+            hintStyle: AppTypography.bodyLarge.copyWith(
+              color: AppColors.textDark.withValues(alpha: 0.5), // Teks placeholder sedikit gelap
             ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.accent, width: 2),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: AppColors.accent.withValues(alpha: 0.3)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
             ),
           ),
         ),

@@ -1,17 +1,18 @@
-import 'dart:convert';
-import 'dart:io';
+// import 'dart:convert';
+// import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:share_plus/share_plus.dart';
+// import 'package:path_provider/path_provider.dart';
+// import 'package:file_picker/file_picker.dart';
+// import 'package:share_plus/share_plus.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../../providers/koleksi_provider.dart';
 import '../../../../providers/narasi_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../../data/database/database_helper.dart';
+// import '../../../../data/database/database_helper.dart';
+import '../../widgets/profile_image.dart';
 import 'kelola_profil_screen.dart';
 import '../auth/login_screen.dart';
 
@@ -23,8 +24,8 @@ class PengaturanScreen extends StatefulWidget {
 }
 
 class _PengaturanScreenState extends State<PengaturanScreen> {
-  bool _isBackingUp = false;
-  bool _isRestoring = false;
+//   bool _isBackingUp = false;
+//   bool _isRestoring = false;
 
   @override
   void initState() {
@@ -39,117 +40,117 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
     });
   }
 
-  Future<void> _eksporProgres() async {
-    // Cache context-dependent objects before async calls to prevent async gaps warnings
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-
-    setState(() => _isBackingUp = true);
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final userId = authProvider.currentUser?.id;
-    if (userId == null) {
-      setState(() => _isBackingUp = false);
-      return;
-    }
-
-    try {
-      final dbHelper = DatabaseHelper.instance;
-      final backupData = await dbHelper.exportBackup(userId);
-      final jsonStr = jsonEncode(backupData);
-
-      final tempDir = await getTemporaryDirectory();
-      final tempFile = File('${tempDir.path}/bharatawayang_cadangan.json');
-      await tempFile.writeAsString(jsonStr);
-
-      final xFile = XFile(tempFile.path);
-      await Share.shareXFiles([
-        xFile,
-      ], subject: 'Cadangan Progres BharataWayang');
-
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Progres berhasil diekspor! Silakan simpan file cadangan.',
-          ),
-          backgroundColor: AppColors.primary,
-        ),
-      );
-    } catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('Gagal mengekspor progres: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isBackingUp = false);
-      }
-    }
-  }
-
-  Future<void> _imporProgres() async {
-    // Cache context-dependent objects before async calls to prevent async gaps warnings
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final koleksiProvider = Provider.of<KoleksiProvider>(
-      context,
-      listen: false,
-    );
-    final narasiProvider = Provider.of<NarasiProvider>(context, listen: false);
-
-    setState(() => _isRestoring = true);
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final userId = authProvider.currentUser?.id;
-    if (userId == null) {
-      setState(() => _isRestoring = false);
-      return;
-    }
-
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
-      );
-
-      if (result == null || result.files.single.path == null) {
-        setState(() => _isRestoring = false);
-        return; // User cancelled
-      }
-
-      final file = File(result.files.single.path!);
-      final jsonStr = await file.readAsString();
-      final backupData = jsonDecode(jsonStr);
-
-      if (backupData is! Map<String, dynamic> ||
-          backupData['version'] == null) {
-        throw 'Format file cadangan tidak valid!';
-      }
-
-      final dbHelper = DatabaseHelper.instance;
-      await dbHelper.importBackup(userId, backupData);
-
-      // Reload data using cached providers
-      await koleksiProvider.loadData(userId);
-      await narasiProvider.loadProgres(userId);
-
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Progres berhasil dipulihkan dari file cadangan! ✓'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
-    } catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('Gagal mengimpor progres: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isRestoring = false);
-      }
-    }
-  }
+//   Future<void> _eksporProgres() async {
+//     // Cache context-dependent objects before async calls to prevent async gaps warnings
+//     final scaffoldMessenger = ScaffoldMessenger.of(context);
+// 
+//     setState(() => _isBackingUp = true);
+//     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+//     final userId = authProvider.currentUser?.id;
+//     if (userId == null) {
+//       setState(() => _isBackingUp = false);
+//       return;
+//     }
+// 
+//     try {
+//       final dbHelper = DatabaseHelper.instance;
+//       final backupData = await dbHelper.exportBackup(userId);
+//       final jsonStr = const JsonEncoder.withIndent('  ').convert(backupData);
+// 
+//       final tempDir = await getTemporaryDirectory();
+//       final tempFile = File('${tempDir.path}/bharatawayang_cadangan.json');
+//       await tempFile.writeAsString(jsonStr);
+// 
+//       final xFile = XFile(tempFile.path);
+//       await Share.shareXFiles([
+//         xFile,
+//       ], subject: 'Cadangan Progres BharataWayang');
+// 
+//       scaffoldMessenger.showSnackBar(
+//         const SnackBar(
+//           content: Text(
+//             'Progres berhasil diekspor! Silakan simpan file cadangan.',
+//           ),
+//           backgroundColor: AppColors.primary,
+//         ),
+//       );
+//     } catch (e) {
+//       scaffoldMessenger.showSnackBar(
+//         SnackBar(
+//           content: Text('Gagal mengekspor progres: $e'),
+//           backgroundColor: Colors.red,
+//         ),
+//       );
+//     } finally {
+//       if (mounted) {
+//         setState(() => _isBackingUp = false);
+//       }
+//     }
+//   }
+// 
+//   Future<void> _imporProgres() async {
+//     // Cache context-dependent objects before async calls to prevent async gaps warnings
+//     final scaffoldMessenger = ScaffoldMessenger.of(context);
+//     final koleksiProvider = Provider.of<KoleksiProvider>(
+//       context,
+//       listen: false,
+//     );
+//     final narasiProvider = Provider.of<NarasiProvider>(context, listen: false);
+// 
+//     setState(() => _isRestoring = true);
+//     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+//     final userId = authProvider.currentUser?.id;
+//     if (userId == null) {
+//       setState(() => _isRestoring = false);
+//       return;
+//     }
+// 
+//     try {
+//       final result = await FilePicker.platform.pickFiles(
+//         type: FileType.custom,
+//         allowedExtensions: ['json'],
+//       );
+// 
+//       if (result == null || result.files.single.path == null) {
+//         setState(() => _isRestoring = false);
+//         return; // User cancelled
+//       }
+// 
+//       final file = File(result.files.single.path!);
+//       final jsonStr = await file.readAsString();
+//       final backupData = jsonDecode(jsonStr);
+// 
+//       if (backupData is! Map<String, dynamic> ||
+//           backupData['version'] == null) {
+//         throw 'Format file cadangan tidak valid!';
+//       }
+// 
+//       final dbHelper = DatabaseHelper.instance;
+//       await dbHelper.importBackup(userId, backupData);
+// 
+//       // Reload data using cached providers
+//       await koleksiProvider.loadData(userId);
+//       await narasiProvider.loadProgres(userId);
+// 
+//       scaffoldMessenger.showSnackBar(
+//         const SnackBar(
+//           content: Text('Progres berhasil dipulihkan dari file cadangan! ✓'),
+//           backgroundColor: AppColors.primary,
+//         ),
+//       );
+//     } catch (e) {
+//       scaffoldMessenger.showSnackBar(
+//         SnackBar(
+//           content: Text('Gagal mengimpor progres: $e'),
+//           backgroundColor: Colors.red,
+//         ),
+//       );
+//     } finally {
+//       if (mounted) {
+//         setState(() => _isRestoring = false);
+//       }
+//     }
+//   }
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +160,7 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
 
     final user = authProvider.currentUser;
     final nama = user?.namaLengkap ?? user?.username ?? "RADEN ARJUNA";
-    final bio = "Ksatria Pandawa • Penikmat Serat";
+    final bio = user?.bio ?? "Ksatria Pandawa • Penikmat Serat";
 
     final totalSeratDibaca = narasiProvider.progresUser
         .where((p) => p.sudahDibaca == 1)
@@ -213,12 +214,17 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
                   ],
                 ),
                 child: ClipOval(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Image.asset(
-                      'assets/images/ui/digital_gunungan_nobg.png',
-                      fit: BoxFit.contain,
-                      color: AppColors.primary,
+                  child: ProfileImage(
+                    fotoProfil: user?.fotoProfil,
+                    size: 120,
+                    fit: BoxFit.cover,
+                    placeholder: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.asset(
+                        'assets/images/ui/digital_gunungan_nobg.png',
+                        fit: BoxFit.contain,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ),
                 ),
@@ -418,93 +424,6 @@ class _PengaturanScreenState extends State<PengaturanScreen> {
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // Ekspor & Impor Cadangan UI
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'CADANGAN DATA',
-                  style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.textDark,
-                    letterSpacing: 2,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _isBackingUp ? null : _eksporProgres,
-                      icon: _isBackingUp
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                color: AppColors.primary,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Icon(Icons.upload, size: 16),
-                      label: Text(
-                        'EKSPOR',
-                        style: AppTypography.buttonText.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accent,
-                        foregroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _isRestoring ? null : _imporProgres,
-                      icon: _isRestoring
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                color: AppColors.accent,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Icon(Icons.download, size: 16),
-                      label: Text(
-                        'IMPOR',
-                        style: AppTypography.buttonText.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                          color: AppColors.accent,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.accent,
-                        side: const BorderSide(
-                          color: AppColors.accent,
-                          width: 1.5,
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
                       ),
                     ),
                   ),
