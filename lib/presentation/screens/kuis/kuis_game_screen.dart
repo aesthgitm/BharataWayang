@@ -39,7 +39,7 @@ class _KuisGameScreenState extends State<KuisGameScreen> {
     });
 
     // Delay lalu ke soal berikutnya
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (!mounted) return;
       final kuisProvider = Provider.of<KuisProvider>(context, listen: false);
       kuisProvider.jawabSoal(jawabanUser);
@@ -71,10 +71,10 @@ class _KuisGameScreenState extends State<KuisGameScreen> {
         int kartuIdToUnlock = 0;
         switch (widget.level) {
           case 1: kartuIdToUnlock = 3; break; // Janaka
-          case 2: kartuIdToUnlock = 6; break; // Sri Kresna
-          case 3: kartuIdToUnlock = 10; break; // Adipati Karna
-          case 4: kartuIdToUnlock = 12; break; // Resi Bisma
-          case 5: kartuIdToUnlock = 17; break; // Batara Indra
+          case 2: kartuIdToUnlock = 10; break; // Adipati Karna
+          case 3: kartuIdToUnlock = 17; break; // Batara Indra 
+          case 4: kartuIdToUnlock = 12; break; // Resi Bisma 
+          case 5: kartuIdToUnlock = 6; break; // Sri Kresna 
         }
         
         if (kuisProvider.skor >= 70 && kartuIdToUnlock != 0 && !koleksiProvider.isKartuUnlocked(kartuIdToUnlock)) {
@@ -212,23 +212,48 @@ class _KuisGameScreenState extends State<KuisGameScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Kartu Soal
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                   // Kartu Soal (With AnimatedSwitcher for question transitions)
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 550),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (Widget child, Animation<double> animation) {
+                      final inAnimation = Tween<Offset>(
+                        begin: const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation);
+                      final outAnimation = Tween<Offset>(
+                        begin: const Offset(-1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation);
+
+                      return ClipRect(
+                        child: SlideTransition(
+                          position: child.key == ValueKey<int>(currentIndex) ? inAnimation : outAnimation,
+                          child: FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          ),
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
+                      );
+                    },
+                    child: Container(
+                      key: ValueKey<int>(currentIndex),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.accent.withValues(alpha: 0.5)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
                         // Nomor soal pill
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -392,6 +417,7 @@ class _KuisGameScreenState extends State<KuisGameScreen> {
                         ],
                       ],
                     ),
+                  ),
                   ),
 
                   const SizedBox(height: 32),

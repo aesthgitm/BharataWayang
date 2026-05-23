@@ -35,7 +35,8 @@ class WayangPuppetState {
   });
 }
 
-class _DalangMainScreenState extends State<DalangMainScreen> {
+class _DalangMainScreenState extends State<DalangMainScreen> with TickerProviderStateMixin {
+  late AnimationController _blencongController;
   final List<WayangPuppetState> _puppets = [];
   int _selectedPuppetIndex = 0;
   final TextEditingController _narasiController = TextEditingController(text: "Suro Diro Joyo Ningrat, Lebur Dening Pangastuti...");
@@ -43,6 +44,13 @@ class _DalangMainScreenState extends State<DalangMainScreen> {
   @override
   void initState() {
     super.initState();
+    _blencongController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..addListener(() {
+        setState(() {});
+      })..repeat(reverse: true);
+
     // Force horizontal/landscape orientation
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -66,6 +74,7 @@ class _DalangMainScreenState extends State<DalangMainScreen> {
 
   @override
   void dispose() {
+    _blencongController.dispose();
     _narasiController.dispose();
     // Restore orientation back to portrait
     SystemChrome.setPreferredOrientations([
@@ -128,19 +137,23 @@ class _DalangMainScreenState extends State<DalangMainScreen> {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          // 1. Background Cream Radial Kelir
+                          // 1. Background Cream Radial Kelir (With Animated Blencong Light Flicker)
                           Container(
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               gradient: RadialGradient(
-                                center: Alignment(0.0, -0.4),
-                                radius: 1.2,
+                                center: const Alignment(0.0, -0.4),
+                                radius: 1.15 + (_blencongController.value * 0.12),
                                 colors: [
-                                  Color(0xFFFFF2D0), // Golden blencong glow
-                                  Color(0xFFE5C88F), // Parchment warm tone
-                                  Color(0xFF4A341A), // Wooden dark border glow
+                                  Color.lerp(
+                                    const Color(0xFFFFF2D0), // Golden blencong glow
+                                    const Color(0xFFFFEFA8),
+                                    _blencongController.value,
+                                  )!,
+                                  const Color(0xFFE5C88F), // Parchment warm tone
+                                  const Color(0xFF4A341A), // Wooden dark border glow
                                   Colors.black,      // Deep shadows
                                 ],
-                                stops: [0.0, 0.4, 0.8, 1.0],
+                                stops: const [0.0, 0.4, 0.8, 1.0],
                               ),
                             ),
                           ),
@@ -161,82 +174,101 @@ class _DalangMainScreenState extends State<DalangMainScreen> {
                                     return Positioned(
                                       left: puppet.position.dx,
                                       top: puppet.position.dy,
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () {
-                                          setState(() {
-                                            _selectedPuppetIndex = index;
-                                          });
+                                      child: TweenAnimationBuilder<double>(
+                                        tween: Tween<double>(begin: 1.0, end: 0.0),
+                                        duration: Duration(milliseconds: 600 + index * 150),
+                                        curve: Curves.easeOutBack,
+                                        builder: (context, slideProgress, child) {
+                                          return Transform.translate(
+                                            offset: Offset(0, slideProgress * 200),
+                                            child: child,
+                                          );
                                         },
-                                        onDoubleTap: () {
-                                          setState(() {
-                                            puppet.isFlipped = !puppet.isFlipped;
-                                          });
-                                        },
-                                        onScaleStart: (details) {
-                                          setState(() {
-                                            _selectedPuppetIndex = index;
-                                          });
-                                        },
-                                        onScaleUpdate: (details) {
-                                          setState(() {
-                                            puppet.position += details.focalPointDelta;
-                                            if (details.scale != 1.0) {
-                                              puppet.scale = (puppet.scale * details.scale).clamp(0.2, 2.0);
-                                            }
-                                            if (details.rotation != 0.0) {
-                                              puppet.rotation += details.rotation;
-                                            }
-                                          });
-                                        },
-                                        child: Transform(
-                                          alignment: Alignment.center,
-                                          transform: Matrix4.diagonal3Values(
-                                            puppet.isFlipped ? -puppet.scale : puppet.scale,
-                                            puppet.scale,
-                                            1.0,
-                                          )..rotateZ(puppet.rotation),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(12),
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: isSelected ? AppColors.accent : Colors.transparent,
-                                                width: 1.5,
+                                        child: GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () {
+                                            setState(() {
+                                              _selectedPuppetIndex = index;
+                                            });
+                                          },
+                                          onDoubleTap: () {
+                                            setState(() {
+                                              puppet.isFlipped = !puppet.isFlipped;
+                                            });
+                                          },
+                                          onScaleStart: (details) {
+                                            setState(() {
+                                              _selectedPuppetIndex = index;
+                                            });
+                                          },
+                                          onScaleUpdate: (details) {
+                                            setState(() {
+                                              puppet.position += details.focalPointDelta;
+                                              if (details.scale != 1.0) {
+                                                puppet.scale = (puppet.scale * details.scale).clamp(0.2, 2.0);
+                                              }
+                                              if (details.rotation != 0.0) {
+                                                puppet.rotation += details.rotation;
+                                              }
+                                            });
+                                          },
+                                          child: TweenAnimationBuilder<double>(
+                                            tween: Tween<double>(begin: 0.0, end: puppet.isFlipped ? 3.14159265 : 0.0),
+                                            duration: const Duration(milliseconds: 400),
+                                            curve: Curves.easeInOutSine,
+                                            builder: (context, yRotation, child) {
+                                              return Transform(
+                                                alignment: Alignment.center,
+                                                transform: Matrix4.identity()
+                                                  ..setEntry(3, 2, 0.0015) // 3D perspective
+                                                  ..rotateY(yRotation)
+                                                  ..multiply(Matrix4.diagonal3Values(puppet.scale, puppet.scale, 1.0))
+                                                  ..rotateZ(puppet.rotation),
+                                                child: child,
+                                              );
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.all(12),
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: isSelected ? AppColors.accent : Colors.transparent,
+                                                  width: 1.5,
+                                                ),
+                                                borderRadius: BorderRadius.circular(8),
                                               ),
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Image.asset(
-                                                  puppet.wayang.imageAsset ?? 'assets/images/ui/digital_gunungan_nobg.png',
-                                                  width: 120,
-                                                  height: 180,
-                                                  fit: BoxFit.contain,
-                                                  errorBuilder: (context, error, stackTrace) => Image.asset(
-                                                    'assets/images/ui/digital_gunungan_nobg.png',
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Image.asset(
+                                                    puppet.wayang.imageAsset ?? 'assets/images/ui/digital_gunungan_nobg.png',
                                                     width: 120,
                                                     height: 180,
                                                     fit: BoxFit.contain,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Container(
-                                                  width: 3,
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    gradient: const LinearGradient(
-                                                      begin: Alignment.topCenter,
-                                                      end: Alignment.bottomCenter,
-                                                      colors: [
-                                                        Color(0xFF4A341A),
-                                                        Colors.black,
-                                                      ],
+                                                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                                                      'assets/images/ui/digital_gunungan_nobg.png',
+                                                      width: 120,
+                                                      height: 180,
+                                                      fit: BoxFit.contain,
                                                     ),
-                                                    borderRadius: BorderRadius.circular(1.5),
                                                   ),
-                                                ),
-                                              ],
+                                                  const SizedBox(height: 4),
+                                                  Container(
+                                                    width: 3,
+                                                    height: 40,
+                                                    decoration: BoxDecoration(
+                                                      gradient: const LinearGradient(
+                                                        begin: Alignment.topCenter,
+                                                        end: Alignment.bottomCenter,
+                                                        colors: [
+                                                          Color(0xFF4A341A),
+                                                          Colors.black,
+                                                        ],
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(1.5),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),

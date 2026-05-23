@@ -39,7 +39,21 @@ class MainShellState extends State<MainShell> {
       backgroundColor: AppColors.secondary,
       body: Stack(
         children: [
-          _screens[_bottomNavIndex],
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 350),
+            switchInCurve: Curves.easeInOut,
+            switchOutCurve: Curves.easeInOut,
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            child: KeyedSubtree(
+              key: ValueKey<int>(_bottomNavIndex),
+              child: _screens[_bottomNavIndex],
+            ),
+          ),
           Align(
             alignment: Alignment.bottomCenter,
             child: _buildCustomBottomBar(),
@@ -100,64 +114,66 @@ class MainShellState extends State<MainShell> {
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: 60,
+        height: 70,
         child: Stack(
           alignment: Alignment.bottomCenter,
           clipBehavior: Clip.none,
           children: [
-            // Inactive State
-            if (!isActive)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icon, color: AppColors.accent, size: 24),
-                  const SizedBox(height: 4),
-                  Text(
-                    label,
-                    style: AppTypography.labelText.copyWith(
-                      color: AppColors.accent,
-                      fontSize: 8,
-                      letterSpacing: 0.5,
-                    ),
+            // Active State Circle Background
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              bottom: isActive ? 20 : -50,
+              child: AnimatedScale(
+                scale: isActive ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutBack,
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: AppColors.secondary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.primary, width: 4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            // Active State (Popped out circle)
-            if (isActive)
-              Positioned(
-                bottom: 20, // Push up
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.primary, width: 4),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(icon, color: AppColors.primary, size: 24),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      label,
-                      style: AppTypography.labelText.copyWith(
-                        color: AppColors.secondary,
-                        fontSize: 8,
-                        letterSpacing: 0.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
                 ),
               ),
+            ),
+            
+            // Icon Position
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              bottom: isActive ? 33 : 25,
+              child: Icon(
+                icon,
+                color: isActive ? AppColors.primary : AppColors.accent,
+                size: 24,
+              ),
+            ),
+            
+            // Label Text Position
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              bottom: 8,
+              child: Text(
+                label,
+                style: AppTypography.labelText.copyWith(
+                  color: isActive ? AppColors.secondary : AppColors.accent,
+                  fontSize: 8,
+                  letterSpacing: 0.5,
+                  fontWeight: isActive ? FontWeight.w700 : FontWeight.normal,
+                ),
+              ),
+            ),
           ],
         ),
       ),

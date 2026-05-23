@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../../providers/koleksi_provider.dart';
 import '../../../../data/models/kartu_wayang_model.dart';
@@ -135,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ],
-              ),
+              ).animate().fade(duration: 400.ms).slideY(begin: -0.2, end: 0.0),
               const SizedBox(height: 16),
               // Divider tipis di bawah header
               Container(
@@ -145,30 +146,35 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 24),
 
               // Welcome Text
-              Text(
-                'SUGENG RAWUH,',
-                style: AppTypography.headingMedium.copyWith(
-                  color: AppColors.textDark,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                userName.toUpperCase(),
-                style: AppTypography.headingLarge.copyWith(
-                  color: AppColors.accent,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Sasana Utama • Jelajahi Wayang dan Kisah Epik',
-                style: AppTypography.bodyMedium.copyWith(
-                  fontStyle: FontStyle.italic,
-                  color: AppColors.textDark.withValues(alpha: 0.7),
-                ),
-              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'SUGENG RAWUH,',
+                    style: AppTypography.headingMedium.copyWith(
+                      color: AppColors.textDark,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    userName.toUpperCase(),
+                    style: AppTypography.headingLarge.copyWith(
+                      color: AppColors.accent,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Sasana Utama • Jelajahi Wayang dan Kisah Epik',
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.textDark.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ).animate().fade(delay: 150.ms, duration: 500.ms).slideY(begin: 0.1, end: 0.0),
               const SizedBox(height: 32),
 
               // Simulasi Dalang Digital Card
@@ -256,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-              ),
+              ).animate().fade(delay: 300.ms, duration: 600.ms).slideY(begin: 0.1, end: 0.0),
               const SizedBox(height: 40),
 
               // Mustika Wayang Section
@@ -321,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
-                    ),
+                    ).animate().fade(delay: 450.ms, duration: 600.ms).slideX(begin: 0.15, end: 0.0),
               const SizedBox(height: 40),
 
               // Kuis Interaktif Section
@@ -406,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-              ),
+              ).animate().fade(delay: 550.ms, duration: 600.ms).slideY(begin: 0.1, end: 0.0),
               const SizedBox(height: 24),
 
               // Pustaka Ulasan Card
@@ -507,7 +513,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-              ),
+              ).animate().fade(delay: 650.ms, duration: 600.ms).slideY(begin: 0.1, end: 0.0),
 
               const SizedBox(height: 32),
               // Bottom decorative heart/ornament
@@ -583,24 +589,34 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => ProfilKsatriaScreen(kartu: kartu)),
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => ProfilKsatriaScreen(kartu: kartu),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 400),
+          ),
         );
       },
-      child: Container(
-        width: 170,
-        margin: const EdgeInsets.only(right: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.accent.withValues(alpha: 0.2)),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
+      child: Hero(
+        tag: 'hero_mustika_${kartu.id}',
+        child: Material(
+          type: MaterialType.transparency,
+          child: Container(
+            width: 170,
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.accent.withValues(alpha: 0.2)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
-          ],
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -703,6 +719,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+      ),
       ),
     );
   }

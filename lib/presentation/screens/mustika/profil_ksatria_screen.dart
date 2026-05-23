@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../data/models/kartu_wayang_model.dart';
@@ -44,34 +45,40 @@ class ProfilKsatriaScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Wayang Card (Replicated from Mustika Screen)
-              Container(
-                width: 180,
-                height: 257, // matches 0.7 aspect ratio (180 / 0.7 = 257)
-                decoration: BoxDecoration(
-                  color: AppColors.dark,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.accent,
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+              Hero(
+                tag: 'hero_mustika_${kartu.id}',
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Container(
+                    width: 180,
+                    height: 257, // matches 0.7 aspect ratio (180 / 0.7 = 257)
+                    decoration: BoxDecoration(
+                      color: AppColors.dark,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.accent,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.accent.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Opacity(
-                    opacity: 0.9,
-                    child: Image.asset(
-                      kartu.imageAsset ?? 'assets/images/ui/digital_gunungan_nobg.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Image.asset(
-                        'assets/images/ui/digital_gunungan_nobg.png',
-                        fit: BoxFit.cover,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Opacity(
+                        opacity: 0.9,
+                        child: Image.asset(
+                          kartu.imageAsset ?? 'assets/images/ui/digital_gunungan_nobg.png',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Image.asset(
+                            'assets/images/ui/digital_gunungan_nobg.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -130,15 +137,19 @@ class ProfilKsatriaScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // Details Section - dari database
-              if (kartu.pusaka != null && kartu.pusaka!.isNotEmpty)
-                _buildDetailRow(Icons.colorize, 'Senjata & Pusaka', kartu.pusaka!),
-              if (kartu.kekuatan != null && kartu.kekuatan!.isNotEmpty)
-                _buildDetailRow(Icons.local_fire_department, 'Ajian & Kesaktian', kartu.kekuatan!),
-              if (kartu.nilaiMoral != null && kartu.nilaiMoral!.isNotEmpty)
-                _buildDetailRow(Icons.psychology, 'Nilai Moral', kartu.nilaiMoral!),
-              if (kartu.deskripsi != null && kartu.deskripsi!.isNotEmpty)
-                _buildDetailRow(Icons.auto_stories, 'Kisah & Peran', kartu.deskripsi!),
+              // Details Section - dari database (with staggered list entry animation)
+              Column(
+                children: [
+                  if (kartu.pusaka != null && kartu.pusaka!.isNotEmpty)
+                    _buildDetailRow(Icons.colorize, 'Senjata & Pusaka', kartu.pusaka!),
+                  if (kartu.kekuatan != null && kartu.kekuatan!.isNotEmpty)
+                    _buildDetailRow(Icons.local_fire_department, 'Ajian & Kesaktian', kartu.kekuatan!),
+                  if (kartu.nilaiMoral != null && kartu.nilaiMoral!.isNotEmpty)
+                    _buildDetailRow(Icons.psychology, 'Nilai Moral', kartu.nilaiMoral!),
+                  if (kartu.deskripsi != null && kartu.deskripsi!.isNotEmpty)
+                    _buildDetailRow(Icons.auto_stories, 'Kisah & Peran', kartu.deskripsi!),
+                ].animate(interval: 100.ms).fade(duration: 400.ms).slideY(begin: 0.15, end: 0.0, curve: Curves.easeOutBack),
+              ),
 
               const SizedBox(height: 16),
               // Skor unlock info

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../providers/koleksi_provider.dart';
@@ -174,7 +175,10 @@ class _MustikaScreenState extends State<MustikaScreen> {
                               itemBuilder: (context, index) {
                                 final kartu = allKartu[index];
                                 final isUnlocked = koleksiProvider.isKartuUnlocked(kartu.id);
-                                return _buildKartuCard(context, kartu, isUnlocked);
+                                return _buildKartuCard(context, kartu, isUnlocked)
+                                    .animate()
+                                    .fade(delay: (index * 80).ms, duration: 400.ms)
+                                    .slideY(begin: 0.15, end: 0.0, curve: Curves.easeOutBack);
                               },
                             ),
                           ),
@@ -191,8 +195,12 @@ class _MustikaScreenState extends State<MustikaScreen> {
       onTap: () {
         if (isUnlocked) {
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => ProfilKsatriaScreen(kartu: kartu),
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) => ProfilKsatriaScreen(kartu: kartu),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              transitionDuration: const Duration(milliseconds: 400),
             ),
           );
         } else {
@@ -204,18 +212,22 @@ class _MustikaScreenState extends State<MustikaScreen> {
           );
         }
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.dark,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isUnlocked ? AppColors.accent : AppColors.primary.withValues(alpha: 0.5),
-            width: isUnlocked ? 2 : 1,
-          ),
-          boxShadow: isUnlocked
-              ? [BoxShadow(color: AppColors.accent.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))]
-              : null,
-        ),
+      child: Hero(
+        tag: 'hero_mustika_${kartu.id}',
+        child: Material(
+          type: MaterialType.transparency,
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.dark,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isUnlocked ? AppColors.accent : AppColors.primary.withValues(alpha: 0.5),
+                width: isUnlocked ? 2 : 1,
+              ),
+              boxShadow: isUnlocked
+                  ? [BoxShadow(color: AppColors.accent.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))]
+                  : null,
+            ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Stack(
@@ -311,6 +323,8 @@ class _MustikaScreenState extends State<MustikaScreen> {
             ],
           ),
         ),
+      ),
+      ),
       ),
     );
   }

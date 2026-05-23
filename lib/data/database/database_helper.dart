@@ -22,7 +22,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 2,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -30,15 +30,73 @@ class DatabaseHelper {
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
+      // 1. Kolom tambahan pada tabel users
       await db.execute('ALTER TABLE users ADD COLUMN email TEXT');
       await db.execute('ALTER TABLE users ADD COLUMN bio TEXT');
-    }
-    if (oldVersion < 3) {
       await db.execute('ALTER TABLE users ADD COLUMN foto_profil TEXT');
-    }
-    if (oldVersion < 4) {
+      
+      // 2. Bersihkan tabel lama yang tidak terpakai
       await db.execute('DROP TABLE IF EXISTS level_unlocked');
       await db.execute('DROP TABLE IF EXISTS faq_mahabharata');
+      
+      // 3. Update nama Adipati Karna di kartu_wayang
+      await db.rawUpdate(
+        "UPDATE kartu_wayang SET nama = 'Adipati Karna' WHERE id = 10"
+      );
+      
+      // 4. Recreate dan re-seed kumpulan_soal untuk sebaran jawaban & tanda baca baru
+      await db.execute('DROP TABLE IF EXISTS kumpulan_soal');
+      await db.execute('''
+        CREATE TABLE kumpulan_soal (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          level INTEGER NOT NULL,
+          kategori TEXT NOT NULL,
+          pertanyaan TEXT NOT NULL,
+          pilihan_a TEXT NOT NULL,
+          pilihan_b TEXT NOT NULL,
+          pilihan_c TEXT NOT NULL,
+          pilihan_d TEXT NOT NULL,
+          jawaban_benar TEXT NOT NULL,
+          penjelasan TEXT
+        )
+      ''');
+      await DatabaseSeeder.seedDatabase(db);
+
+      // 5. Migrasikan user_koleksi agar sesuai dengan urutan reward kartu kuis yang baru
+      try {
+        final List<Map<String, dynamic>> progressList = await db.query(
+          'progres_kuis',
+          where: 'skor >= 70',
+        );
+
+        for (final progress in progressList) {
+          final userId = progress['user_id'] as int;
+          final level = progress['level'] as int;
+          int newKartuId = 0;
+          
+          switch (level) {
+            case 1: newKartuId = 3; break;  // Janaka
+            case 2: newKartuId = 10; break; // Adipati Karna
+            case 3: newKartuId = 17; break; // Batara Indra
+            case 4: newKartuId = 12; break; // Resi Bisma
+            case 5: newKartuId = 6; break;  // Sri Kresna
+          }
+
+          if (newKartuId != 0) {
+            await db.insert(
+              'user_koleksi',
+              {
+                'user_id': userId,
+                'kartu_id': newKartuId,
+                'unlocked_at': DateTime.now().toIso8601String(),
+              },
+              conflictAlgorithm: ConflictAlgorithm.ignore,
+            );
+          }
+        }
+      } catch (e) {
+        // Silently ignore if query fails during migration
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../providers/auth_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
@@ -37,19 +38,30 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     if (!mounted) return;
     
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
-    if (authProvider.isLoggedIn) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => const MainShell(),
-          settings: const RouteSettings(name: '/main_shell'),
-        ),
-      );
-    } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-      );
-    }
+    final Widget destination = authProvider.isLoggedIn 
+        ? const MainShell() 
+        : const WelcomeScreen();
+        
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => destination,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.92, end: 1.0).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+              ),
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 700),
+        settings: authProvider.isLoggedIn 
+            ? const RouteSettings(name: '/main_shell') 
+            : null,
+      ),
+    );
   }
 
   @override
@@ -73,7 +85,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 width: 200,
                 height: 200,
                 fit: BoxFit.contain,
-              ),
+              ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+               .scale(
+                 begin: const Offset(0.92, 0.92),
+                 end: const Offset(1.06, 1.06),
+                 duration: 1800.ms,
+                 curve: Curves.easeInOutSine,
+               ),
               const SizedBox(height: 24),
               Text(
                 'BHARATAWAYANG',
@@ -99,7 +117,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     Icons.diamond_outlined,
                     color: AppColors.accent,
                     size: 12,
-                  ),
+                  ).animate(onPlay: (controller) => controller.repeat())
+                   .rotate(duration: 4000.ms),
                   const SizedBox(width: 8),
                   Container(
                     height: 1,

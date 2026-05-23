@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../auth/login_screen.dart';
@@ -24,6 +25,10 @@ class WelcomeScreen extends StatelessWidget {
                 width: 180,
                 height: 180,
                 fit: BoxFit.contain,
+              ).animate().fade(duration: 800.ms).scale(
+                begin: const Offset(0.8, 0.8),
+                end: const Offset(1.0, 1.0),
+                curve: Curves.easeOutBack,
               ),
               const SizedBox(height: 24),
               // App Title
@@ -35,7 +40,7 @@ class WelcomeScreen extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   color: AppColors.secondary,
                 ),
-              ),
+              ).animate().fade(delay: 200.ms, duration: 600.ms).slideY(begin: 0.2, end: 0.0),
               const SizedBox(height: 16),
               // Decorative Line
               Row(
@@ -59,7 +64,7 @@ class WelcomeScreen extends StatelessWidget {
                     color: AppColors.accent.withValues(alpha: 0.5),
                   ),
                 ],
-              ),
+              ).animate().fade(delay: 300.ms, duration: 600.ms).slideY(begin: 0.2, end: 0.0),
               const SizedBox(height: 48),
               // Subtitle
               Text(
@@ -70,7 +75,7 @@ class WelcomeScreen extends StatelessWidget {
                   height: 1.5,
                   fontWeight: FontWeight.w300,
                 ),
-              ),
+              ).animate().fade(delay: 450.ms, duration: 600.ms).slideY(begin: 0.2, end: 0.0),
               const Spacer(),
               // Buttons
               SizedBox(
@@ -78,7 +83,20 @@ class WelcomeScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(),
+                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          const begin = Offset(1.0, 0.0);
+                          const end = Offset.zero;
+                          const curve = Curves.easeInOutCubic;
+                          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                        transitionDuration: const Duration(milliseconds: 500),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -104,14 +122,27 @@ class WelcomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
+              ).animate().fade(delay: 600.ms, duration: 600.ms).slideY(begin: 0.2, end: 0.0),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) => const RegisterScreen(),
+                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          const begin = Offset(1.0, 0.0);
+                          const end = Offset.zero;
+                          const curve = Curves.easeInOutCubic;
+                          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                          return SlideTransition(
+                            position: animation.drive(tween),
+                            child: child,
+                          );
+                        },
+                        transitionDuration: const Duration(milliseconds: 500),
+                      ),
                     );
                   },
                   style: OutlinedButton.styleFrom(
@@ -137,7 +168,7 @@ class WelcomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
+              ).animate().fade(delay: 700.ms, duration: 600.ms).slideY(begin: 0.2, end: 0.0),
             ],
           ),
         ),

@@ -132,150 +132,157 @@ class _DalangPilihScreenState extends State<DalangPilihScreen> {
                         );
                       }
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.accent
-                              : isUnlocked
-                                  ? AppColors.accent.withValues(alpha: 0.3)
-                                  : AppColors.primary.withValues(alpha: 0.5),
-                          width: isSelected ? 3.0 : 1.5,
+                    child: AnimatedScale(
+                      scale: isSelected ? 1.03 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOutBack,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.accent
+                                : isUnlocked
+                                    ? AppColors.accent.withValues(alpha: 0.3)
+                                    : AppColors.primary.withValues(alpha: 0.5),
+                            width: isSelected ? 3.0 : 1.5,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.accent.withValues(alpha: 0.4),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  )
+                                ]
+                              : null,
                         ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: AppColors.accent.withValues(alpha: 0.4),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                )
-                              ]
-                            : null,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            // Grayscale representation for locked cards
-                            ColorFiltered(
-                              colorFilter: isUnlocked
-                                  ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
-                                  : const ColorFilter.matrix([
-                                      0.2126, 0.7152, 0.0722, 0, 0,
-                                      0.2126, 0.7152, 0.0722, 0, 0,
-                                      0.2126, 0.7152, 0.0722, 0, 0,
-                                      0,      0,      0,      1, 0,
-                                    ]),
-                              child: Opacity(
-                                opacity: isUnlocked ? (isSelected ? 0.6 : 0.4) : 0.15,
-                                child: Image.asset(
-                                  kartu.imageAsset ?? 'assets/images/ui/digital_gunungan_nobg.png',
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Image.asset(
-                                    'assets/images/ui/digital_gunungan_nobg.png',
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              // Grayscale representation for locked cards
+                              ColorFiltered(
+                                colorFilter: isUnlocked
+                                    ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
+                                    : const ColorFilter.matrix([
+                                        0.2126, 0.7152, 0.0722, 0, 0,
+                                        0.2126, 0.7152, 0.0722, 0, 0,
+                                        0.2126, 0.7152, 0.0722, 0, 0,
+                                        0,      0,      0,      1, 0,
+                                      ]),
+                                child: Opacity(
+                                  opacity: isUnlocked ? (isSelected ? 0.6 : 0.4) : 0.15,
+                                  child: Image.asset(
+                                    kartu.imageAsset ?? 'assets/images/ui/digital_gunungan_nobg.png',
                                     fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            // Lock icon for locked cards
-                            if (!isUnlocked)
-                              Center(
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.6),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.lock, color: AppColors.accent, size: 24),
-                                ),
-                              ),
-
-                            // Selection Checkmark
-                            if (isSelected)
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.accent,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.check, color: AppColors.primary, size: 16),
-                                ),
-                              ),
-
-                            // Rarity badge if unlocked
-                            if (isUnlocked)
-                              Positioned(
-                                top: 8,
-                                left: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.accent.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: AppColors.accent, width: 0.5),
-                                  ),
-                                  child: Text(
-                                    kartu.rarity ?? 'Umum',
-                                    style: AppTypography.labelText.copyWith(
-                                      color: AppColors.accent,
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.bold,
+                                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                                      'assets/images/ui/digital_gunungan_nobg.png',
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
                               ),
 
-                            // Nama & Title at bottom
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.transparent,
-                                      AppColors.primary.withValues(alpha: 0.8),
-                                      AppColors.primary,
-                                    ],
+                              // Lock icon for locked cards
+                              if (!isUnlocked)
+                                Center(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.6),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.lock, color: AppColors.accent, size: 24),
                                   ),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      kartu.nama.toUpperCase(),
-                                      style: AppTypography.headingSmall.copyWith(
-                                        color: isUnlocked ? AppColors.secondary : AppColors.secondary.withValues(alpha: 0.5),
-                                        fontSize: 12,
+
+                              // Selection Checkmark
+                              if (isSelected)
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.accent,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.check, color: AppColors.primary, size: 16),
+                                  ),
+                                ),
+
+                              // Rarity badge if unlocked
+                              if (isUnlocked)
+                                Positioned(
+                                  top: 8,
+                                  left: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.accent.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: AppColors.accent, width: 0.5),
+                                    ),
+                                    child: Text(
+                                      kartu.rarity ?? 'Umum',
+                                      style: AppTypography.labelText.copyWith(
+                                        color: AppColors.accent,
+                                        fontSize: 8,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      kartu.afiliasi ?? '',
-                                      style: AppTypography.labelText.copyWith(
-                                        color: AppColors.accent.withValues(alpha: 0.7),
-                                        fontSize: 8,
-                                      ),
+                                  ),
+                                ),
+
+                              // Nama & Title at bottom
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.transparent,
+                                        AppColors.primary.withValues(alpha: 0.8),
+                                        AppColors.primary,
+                                      ],
                                     ),
-                                  ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        kartu.nama.toUpperCase(),
+                                        style: AppTypography.headingSmall.copyWith(
+                                          color: isUnlocked ? AppColors.secondary : AppColors.secondary.withValues(alpha: 0.5),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        kartu.afiliasi ?? '',
+                                        style: AppTypography.labelText.copyWith(
+                                          color: AppColors.accent.withValues(alpha: 0.7),
+                                          fontSize: 8,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
