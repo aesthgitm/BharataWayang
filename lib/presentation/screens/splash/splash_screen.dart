@@ -103,7 +103,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 ),
               ),
               const SizedBox(height: 16),
-              // Decorative Line
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

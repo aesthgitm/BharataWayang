@@ -2,8 +2,7 @@
 
 [![Flutter Version](https://img.shields.io/badge/Flutter-%3E%3D3.19.0-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart Version](https://img.shields.io/badge/Dart-%3E%3D3.3.0-0175C2?logo=dart&logoColor=white)](https://dart.dev)
-[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Windows-lightgrey)](#)
-[![License](https://img.shields.io/badge/License-MIT-green)](#)
+[![Platform](https://img.shields.io/badge/Platform-Android-lightgrey)](#)
 
 **BharataWayang** adalah aplikasi edukasi dan eksplorasi budaya digital interaktif yang dirancang untuk memperkenalkan warisan budaya Wayang serta kisah epik Mahabharata kepada generasi muda. Dengan pendekatan visual premium bernuansa tradisional-modern serta adanya fitur gamifikasi, aplikasi ini menghadirkan pengalaman belajar budaya nusantara yang interaktif, edukatif, dan menyenangkan bagi pengguna.
 

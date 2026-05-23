@@ -3,7 +3,6 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../screens/home/home_screen.dart';
 
-// Import placeholders for other screens
 import '../screens/kawruh/kawruh_screen.dart';
 import '../screens/serat/serat_screen.dart';
 import '../screens/mustika/mustika_screen.dart';
@@ -30,7 +29,7 @@ class MainShellState extends State<MainShell> {
     const KawruhScreen(),
     const SeratScreen(),
     const MustikaScreen(),
-    const PengaturanScreen(), // Using Pengaturan as Profil for now
+    const PengaturanScreen(), // profil
   ];
 
   @override
@@ -69,7 +68,6 @@ class MainShellState extends State<MainShell> {
       margin: const EdgeInsets.all(16),
       child: Stack(
         children: [
-          // Background Bar
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -119,7 +117,7 @@ class MainShellState extends State<MainShell> {
           alignment: Alignment.bottomCenter,
           clipBehavior: Clip.none,
           children: [
-            // Active State Circle Background
+            // indikator aktif
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutBack,
@@ -147,7 +145,6 @@ class MainShellState extends State<MainShell> {
               ),
             ),
             
-            // Icon Position
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutBack,
@@ -159,7 +156,6 @@ class MainShellState extends State<MainShell> {
               ),
             ),
             
-            // Label Text Position
             AnimatedPositioned(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutBack,

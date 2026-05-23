@@ -104,20 +104,18 @@ class _DalangMainScreenState extends State<DalangMainScreen> with TickerProvider
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background pinggir layar (menutupi seluruh layar secara penuh tanpa terpotong)
+          // Background panggung
           Image.asset(
             'assets/images/backgrounds/bg_simulasidalang.png',
             fit: BoxFit.fill,
           ),
           
-          // Overlay redup
           Container(color: Colors.black.withValues(alpha: 0.4)),
 
-          // Area Konten Utama dibatasi SafeArea agar aman dari notch/status bar
           SafeArea(
             child: Column(
               children: [
-                // Kelir Panggung Utama (Center Stage) yang menyesuaikan sisa ruang vertikal
+                // Kelir panggung utama
                 Expanded(
                   child: Container(
                     margin: const EdgeInsets.fromLTRB(60, 16, 60, 8),
@@ -137,7 +135,7 @@ class _DalangMainScreenState extends State<DalangMainScreen> with TickerProvider
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          // 1. Background Cream Radial Kelir (With Animated Blencong Light Flicker)
+                          // Efek lampu blencong
                           Container(
                             decoration: BoxDecoration(
                               gradient: RadialGradient(
@@ -158,7 +156,7 @@ class _DalangMainScreenState extends State<DalangMainScreen> with TickerProvider
                             ),
                           ),
 
-                          // 2. Puppets layer
+                          // Layer wayang
                           _puppets.isEmpty
                               ? const Center(
                                   child: Text(
@@ -277,7 +275,7 @@ class _DalangMainScreenState extends State<DalangMainScreen> with TickerProvider
                                   }),
                                 ),
 
-                          // 3. Sabda Dalang (Narration Box) inside the Kelir Stage
+                          // Kotak narasi Sabda Dalang
                           Positioned(
                             top: 8,
                             left: 12,
@@ -333,12 +331,12 @@ class _DalangMainScreenState extends State<DalangMainScreen> with TickerProvider
                   ),
                 ),
 
-                // Area Navigasi dan Petunjuk Kontrol di bagian bawah (sejajar)
+                // Panel kontrol bawah
                 Padding(
                   padding: const EdgeInsets.fromLTRB(60, 4, 60, 12),
                   child: Row(
                     children: [
-                      // Sisi Kiri: Tombol Navigasi (Back, Home, Restart)
+                      // Navigasi & aksi
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -380,7 +378,7 @@ class _DalangMainScreenState extends State<DalangMainScreen> with TickerProvider
                         ],
                       ),
                       const SizedBox(width: 16),
-                      // Sisi Kanan: Teks Petunjuk Interaksi
+                      // Petunjuk interaksi panggung
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),

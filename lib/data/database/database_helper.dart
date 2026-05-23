@@ -16,7 +16,7 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
-    // Menggunakan getApplicationDocumentsDirectory agar file database disimpan di area persisten dokumen aplikasi
+    // simpan database di dokumen aplikasi agar persisten
     final directory = await getApplicationDocumentsDirectory();
     final path = join(directory.path, filePath);
 
@@ -30,21 +30,21 @@ class DatabaseHelper {
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // 1. Kolom tambahan pada tabel users
+      // upgrade tabel user
       await db.execute('ALTER TABLE users ADD COLUMN email TEXT');
       await db.execute('ALTER TABLE users ADD COLUMN bio TEXT');
       await db.execute('ALTER TABLE users ADD COLUMN foto_profil TEXT');
       
-      // 2. Bersihkan tabel lama yang tidak terpakai
+      // hapus tabel yang gak kepake lagi
       await db.execute('DROP TABLE IF EXISTS level_unlocked');
       await db.execute('DROP TABLE IF EXISTS faq_mahabharata');
       
-      // 3. Update nama Adipati Karna di kartu_wayang
+      // koreksi nama kartu adipati karna
       await db.rawUpdate(
         "UPDATE kartu_wayang SET nama = 'Adipati Karna' WHERE id = 10"
       );
       
-      // 4. Recreate dan re-seed kumpulan_soal untuk sebaran jawaban & tanda baca baru
+      // reset & seed ulang bank soal biar update tanda baca & opsi jawaban terbaru
       await db.execute('DROP TABLE IF EXISTS kumpulan_soal');
       await db.execute('''
         CREATE TABLE kumpulan_soal (
@@ -62,7 +62,7 @@ class DatabaseHelper {
       ''');
       await DatabaseSeeder.seedDatabase(db);
 
-      // 5. Migrasikan user_koleksi agar sesuai dengan urutan reward kartu kuis yang baru
+      // cocokin ulang koleksi user dengan urutan reward kartu level kuis baru
       try {
         final List<Map<String, dynamic>> progressList = await db.query(
           'progres_kuis',
@@ -95,7 +95,7 @@ class DatabaseHelper {
           }
         }
       } catch (e) {
-        // Silently ignore if query fails during migration
+        // abaikan kalau gagal saat migrasi
       }
     }
   }
@@ -251,12 +251,12 @@ class DatabaseHelper {
     final db = await database;
     
     await db.transaction((txn) async {
-      // 1. Clean existing records for this user
+      // bersihkan data lama user ini
       await txn.delete('user_koleksi', where: 'user_id = ?', whereArgs: [userId]);
       await txn.delete('progres_kuis', where: 'user_id = ?', whereArgs: [userId]);
       await txn.delete('progres_narasi', where: 'user_id = ?', whereArgs: [userId]);
 
-      // 2. Restore user_koleksi
+      // restore koleksi kartu
       if (backupData['user_koleksi'] != null) {
         final List<dynamic> collections = backupData['user_koleksi'];
         for (var item in collections) {
@@ -274,7 +274,7 @@ class DatabaseHelper {
         }
       }
 
-      // 3. Restore progres_kuis
+      // restore progress kuis
       if (backupData['progres_kuis'] != null) {
         final List<dynamic> kuis = backupData['progres_kuis'];
         for (var item in kuis) {
@@ -294,7 +294,7 @@ class DatabaseHelper {
         }
       }
 
-      // 4. Restore progres_narasi
+      // restore progress baca narasi
       if (backupData['progres_narasi'] != null) {
         final List<dynamic> narasi = backupData['progres_narasi'];
         for (var item in narasi) {

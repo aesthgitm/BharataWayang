@@ -19,7 +19,6 @@ class WelcomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              // Logo
               Image.asset(
                 'assets/images/ui/digital_gunungan_nobg.png',
                 width: 180,
@@ -31,7 +30,6 @@ class WelcomeScreen extends StatelessWidget {
                 curve: Curves.easeOutBack,
               ),
               const SizedBox(height: 24),
-              // App Title
               Text(
                 'BHARATAWAYANG',
                 style: AppTypography.headingMedium.copyWith(
@@ -42,7 +40,6 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ).animate().fade(delay: 200.ms, duration: 600.ms).slideY(begin: 0.2, end: 0.0),
               const SizedBox(height: 16),
-              // Decorative Line
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -66,7 +63,6 @@ class WelcomeScreen extends StatelessWidget {
                 ],
               ).animate().fade(delay: 300.ms, duration: 600.ms).slideY(begin: 0.2, end: 0.0),
               const SizedBox(height: 48),
-              // Subtitle
               Text(
                 'Jelajahi epik Mahabharata dalam\nbalutan estetika keraton modern.\nMulai perjalanan spiritual Anda.',
                 textAlign: TextAlign.center,
@@ -77,7 +73,6 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ).animate().fade(delay: 450.ms, duration: 600.ms).slideY(begin: 0.2, end: 0.0),
               const Spacer(),
-              // Buttons
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
